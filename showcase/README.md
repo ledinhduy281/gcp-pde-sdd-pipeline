@@ -1,29 +1,23 @@
-# GCP Pipeline Visualizer, Executive Presentation & GCP UI Walkthrough
+# Excelerate-Jinder on GCP — Visualizer, Executive Presentation & GCP UI Walkthrough
 
-This directory contains three modular suites designed for **visual learning**, **non-technical executive presentations**, and **step-by-step Google Cloud Console (UI) inspection**:
+This directory contains three modular suites tailored for **learning Google Cloud from scratch**, **presenting the Excelerate-Jinder Data Platform**, and **navigating the Google Cloud Console (Web UI) step by step**:
 
 ```text
 showcase/
-├── 01-pipeline-visualizer/          # Interactive HTML/CSS/JS Pipeline Simulator for learning GCP from scratch
-│   ├── index.html                   # Open directly in any browser (works via file:// or local server)
-│   ├── styles/
-│   │   ├── base.css                 # Modern dark/glassmorphic layout & responsive grid
-│   │   └── pipeline-animations.css  # Animated data packets, pulsing nodes & cost meter transitions
-│   └── scripts/
-│       ├── nodes-data.js            # Plain-language analogies, GCP concepts, PDE exam tips & Terraform links
-│       ├── simulator-engine.js      # Interactive packet flow simulator (Valid, Late, Malformed DLQ, Batch)
-│       └── app.js                   # Interactive controller, Guided Tour & Live Hourly Cost Switchboard
+├── README.md                                         # Quick launch guide
+├── 01-pipeline-visualizer/                           # 1. INTERACTIVE PIPELINE VISUALIZER & OFFICIAL GCP DIAGRAM
+│   ├── gcp-architecture-diagram.html                 # Official Google Cloud Reference Architecture Diagram (SVG + Export)
+│   ├── index.html                                    # Beginner-friendly interactive simulator & hourly cost calculator
+│   ├── assets/gcp-pipeline-diagram.svg               # Standalone vector diagram for PowerPoint / Google Slides
+│   ├── styles/                                       # Modular CSS (base.css, pipeline-animations.css, gcp-diagram.css)
+│   └── scripts/                                      # Modular JS (nodes-data.js, simulator-engine.js, app.js, gcp-diagram.js)
 │
-├── 02-executive-presentation/       # Animated HTML Slide Deck (High-level business overview, zero heavy jargon)
-│   ├── index.html                   # Fullscreen-ready animated presentation deck (EN / VI bilingual toggle)
-│   ├── styles/
-│   │   ├── deck.css                 # Slide typography, cards, and executive visual layouts
-│   │   └── transitions.css          # Smooth View Transitions & staggered keyframe animations
-│   └── scripts/
-│       ├── slides-content.js        # 8 executive slides + speaker notes (Bilingual EN / VI)
-│       └── deck-controller.js       # Keyboard/Click navigation, Overview Grid, Speaker Notes & Fullscreen
+├── 02-executive-presentation/                        # 2. ANIMATED HTML SLIDE DECK FOR EXECUTIVE PRESENTATIONS
+│   ├── index.html                                    # Fullscreen slide deck with Speaker Notes & VI/EN toggle
+│   ├── styles/                                       # Modular CSS (deck.css, transitions.css)
+│   └── scripts/                                      # Modular JS (slides-content.js, deck-controller.js)
 │
-└── 03-gcp-ui-walkthrough/           # Step-by-Step GCP Console (Web UI) Inspection Guides
+└── 03-gcp-ui-walkthrough/                            # 3. STEP-BY-STEP GCP CONSOLE (WEB UI) INSPECTION GUIDES
     ├── 00-console-basics-and-billing.md
     ├── 01-iam-kms-and-security-ui.md
     ├── 02-cloud-storage-lakehouse-ui.md
@@ -33,16 +27,10 @@ showcase/
     └── 06-hourly-labs-verification-ui.md
 ```
 
----
-
-## How to Open the Interactive Apps
-
-You can open both apps directly in Chrome/Safari without installing anything:
+## Quick Open Commands (macOS)
 
 ```bash
-# 1. Open the Interactive Pipeline Learning Visualizer
+open showcase/01-pipeline-visualizer/gcp-architecture-diagram.html
 open showcase/01-pipeline-visualizer/index.html
-
-# 2. Open the Animated Executive Slide Deck
 open showcase/02-executive-presentation/index.html
 ```

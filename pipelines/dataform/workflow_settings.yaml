@@ -1,4 +1,4 @@
-defaultProject: erudite-skill-273102
+defaultProject: your-gcp-project-id
 defaultLocation: us-central1
 defaultDataset: staging
 defaultAssertionDataset: staging_assertions

@@ -1,14 +1,34 @@
-# SPEC 01: Connection & Bootstrap Specification
+# SPEC 01: Local Jinder Execution & GCP Connection Bootstrap Specification
 
 ## 1. Objective
-Establish a reproducible, keyless connection between **Antigravity IDE (macOS)**, your **Google Cloud Platform (GCP) \$300 Free Trial Account**, **Terraform Remote State**, and a brand-new repository on **GitHub (`https://github.com/ledinhduy281/gcp-pde-sdd-pipeline`)**.
+Provide a deterministic protocol for:
+1. Running the full **Excelerate-Jinder Web Application** locally on any machine (`http://localhost:8095/`) with zero external dependencies.
+2. Establishing a keyless connection between **Antigravity IDE (macOS)**, your **Google Cloud Platform (GCP) $300 Free Trial Account**, **Terraform Remote State**, and your public repository on **GitHub (`https://github.com/ledinhduy281/gcp-pde-sdd-pipeline`)**.
 
 ---
 
-## 2. Step-by-Step Connection Protocol
+## 2. Mode A: Running Excelerate-Jinder Locally (For Any User Cloning the Repo)
 
-### Step 2.1: Authenticate Google Cloud CLI & Application Default Credentials (ADC)
-Run the following commands in the Antigravity IDE terminal:
+No GCP account or third-party `pip` package is required to run the Jinder web application locally:
+```bash
+# 1. Start the Jinder Web App with seeded Demo Talent & Employer accounts
+make run-jinder-local
+# (Equivalent to: python3 jinder_platform/start.py --demo)
+
+# 2. Open http://localhost:8095/ in your browser
+# Demo Employer: recruiter@demo.jinder.app
+# Demo Talent  : candidate@demo.jinder.app
+
+# 3. Run the 729 autonomous Jinder platform tests & GCP Data Contract tests
+make test-jinder-local
+make test
+```
+
+---
+
+## 3. Mode B: Connecting GCP & Deploying the Terraform Lakehouse (Project Owner Only)
+
+### Step 3.1: Authenticate Google Cloud CLI & Application Default Credentials (ADC)
 ```bash
 # 1. Authenticate gcloud CLI with your Google account
 gcloud auth login
@@ -26,29 +46,27 @@ gcloud auth application-default login
 gcloud auth application-default set-quota-project "${GCP_PROJECT_ID}"
 ```
 
-### Step 2.2: Bootstrap GCP APIs & Terraform State Bucket
-Execute `make bootstrap` (which runs `scripts/bootstrap_gcp.sh`):
+### Step 3.2: Bootstrap GCP APIs & Terraform State Bucket
+Execute `make bootstrap` (runs `scripts/bootstrap_gcp.sh`):
 - Enables required Google Cloud APIs (`storage`, `bigquery`, `pubsub`, `dataflow`, `dataproc`, `bigtableadmin`, `sqladmin`, `datastream`, `workflows`, `cloudkms`, `datacatalog`, `iam`, `sts`, `iamcredentials`).
 - Creates a regional GCS bucket `gs://${GCP_PROJECT_ID}-tfstate` with `uniform-bucket-level-access`, `public-access-prevention`, and **Object Versioning** enabled.
 
-### Step 2.3: Authenticate GitHub CLI & Create Repository on `github.com/ledinhduy281`
+### Step 3.3: Authenticate GitHub CLI & Push to `github.com/ledinhduy281`
 ```bash
-# 1. Authenticate GitHub CLI
 gh auth login -h github.com -p https -w
 
-# 2. Initialize Git repository and push to a brand-new GitHub repo
 git init -b main
 git add .
-git commit -m "chore(sdd): initialize Spec-Driven GCP PDE pipeline and Terraform IaC"
+git commit -m "feat(jinder-gcp): unify Excelerate-Jinder app with Spec-Driven GCP PDE pipeline"
 gh repo create ledinhduy281/gcp-pde-sdd-pipeline \
   --public \
-  --description "Spec-Driven GCP Data Engineering Pipeline (Terraform IaC) for Professional Data Engineer Certification" \
+  --description "Excelerate-Jinder Capability Alignment App & Spec-Driven GCP Data Engineering Pipeline (Terraform IaC)" \
   --source=. \
   --remote=origin \
   --push
 ```
 
-### Step 2.4: Initialize & Deploy Core Serverless Terraform Stack
+### Step 3.4: Initialize & Deploy Core Serverless Terraform Stack ($0/hr)
 ```bash
 make init
 make validate-infra
@@ -57,7 +75,7 @@ make apply-core
 
 ---
 
-## 3. Acceptance Criteria
-- `AC-01.1`: `gcloud auth application-default print-access-token` succeeds with exit code `0`.
-- `AC-01.2`: `gcloud storage buckets describe gs://${GCP_PROJECT_ID}-tfstate --format="value(versioning.enabled)"` outputs `True`.
-- `AC-01.3`: `gh repo view ledinhduy281/gcp-pde-sdd-pipeline` returns the active GitHub repository metadata.
+## 4. Acceptance Criteria
+- `AC-01.1`: `make test` passes all Data Contract and Jinder `FRS*` behavioral formula checks.
+- `AC-01.2`: `gcloud auth application-default print-access-token` succeeds with exit code `0`.
+- `AC-01.3`: `gcloud storage buckets describe gs://${GCP_PROJECT_ID}-tfstate --format="value(versioning.enabled)"` outputs `True`.

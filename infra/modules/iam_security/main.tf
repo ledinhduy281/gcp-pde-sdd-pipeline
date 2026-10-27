@@ -38,12 +38,6 @@ resource "google_project_iam_member" "orchestrate_bq_job_user" {
   member  = "serviceAccount:${google_service_account.sa_orchestrate.email}"
 }
 
-resource "google_project_iam_member" "orchestrate_bq_data_editor" {
-  project = var.project_id
-  role    = "roles/bigquery.dataEditor"
-  member  = "serviceAccount:${google_service_account.sa_orchestrate.email}"
-}
-
 resource "google_project_iam_member" "orchestrate_workflows_invoker" {
   project = var.project_id
   role    = "roles/workflows.invoker"

@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jinder Intelligence Engine — Mathematical Architecture & Canonical Formulas (ASD-STE100)</title>
+  
+  <!-- Jinder Official Favicon -->
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none'%3E%3Crect width='40' height='40' rx='10' fill='%23151531'/%3E%3Crect x='8.5' y='9' width='13' height='18' rx='3' fill='%236868f7' transform='rotate(-12 15 18)'/%3E%3Crect x='18.5' y='9' width='13' height='18' rx='3' fill='%23ffa340' transform='rotate(12 25 18)'/%3E%3Ccircle cx='20' cy='27' r='6' fill='%23fff' stroke='%23151531' stroke-width='1.5'/%3E%3Cpath d='M17.4 27.1l1.8 1.8 3.4-3.6' stroke='%23151531' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Inter & JetBrains Mono Fonts matching Jinder App Design System -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for High-Precision Mathematical Typography -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       JINDER DESIGN SYSTEM TOKENS (1:1 with app styles.css)
+       ========================================================================== */
+    :root {
+      --primary: #151531;
+      --ink: #151531;
+      --ink-deep: #0d131b;
+      --ink-soft: #2a2a63;
+      --body: #343a40;
+      --muted: #868e96;
+      --muted-soft: #adb5bd;
+      --canvas: #ffffff;
+      --surface-subtle: #f8f9fa;
+      --surface-strong: #edf0f2;
+      --hairline: #e9ecef;
+      --accent: #6868f7;
+      --accent-tint: #f0f0fe;
+      --orange: #ffa340;
+      --orange-tint: #ffe9c8;
+      --tint-pink: #f9e2fb;
+      --tint-pink-ink: #560059;
+      --tint-blue: #c9f0ff;
+      --tint-blue-ink: #003d5a;
+      --tint-green: #daf9d4;
+      --tint-green-ink: #005900;
+      --tint-yellow: #fff5c7;
+      --tint-yellow-ink: #a68716;
+      --success: #32ae47;
+      --error: #f53d3d;
+
+      --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --r-xs: 6px;
+      --r-sm: 8px;
+      --r-md: 10px;
+      --r-lg: 14px;
+      --r-xl: 18px;
+      --r-xxl: 24px;
+      --r-pill: 9999px;
+
+      --sh-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --sh-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+      --sh-md: 0 4px 16px 0 rgba(21, 21, 49, 0.08);
+      --sh-lg: 0 10px 28px -4px rgba(21, 21, 49, 0.12);
+
+      --ease: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      background-color: var(--surface-subtle);
+      color: var(--body);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Strict 100vh Shell, Zero Page Scroll */
+    .app-screen {
+      height: 100vh;
+      max-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--surface-subtle);
+    }
+
+    /* Jinder Top Navigation Bar */
+    header.top-nav {
+      height: 60px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.98);
+      border-bottom: 1px solid var(--hairline);
+      box-shadow: var(--sh-xs);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 50;
+      gap: 12px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(21, 21, 49, 0.18);
+    }
+
+    .logo-word {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .logo-word span { color: var(--accent); }
+
+    .brand-divider {
+      width: 1px;
+      height: 26px;
+      background: var(--hairline);
+      flex-shrink: 0;
+    }
+
+    .portal-tag {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      line-height: 1.25;
+    }
+
+    .portal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .portal-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* Segmented Tab Bar */
+    .tab-segmented-bar {
+      display: flex;
+      align-items: center;
+      background: var(--surface-strong);
+      padding: 3px;
+      border-radius: var(--r-md);
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .tab-pill {
+      border: 0;
+      background: transparent;
+      color: var(--body);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s var(--ease);
+      white-space: nowrap;
+    }
+
+    .tab-pill:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.6);
+      color: var(--ink);
+    }
+
+    .tab-pill.active {
+      background: var(--canvas);
+      color: var(--accent);
+      box-shadow: var(--sh-xs);
+    }
+
+    .tab-pill .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Badges & Chips */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+    .chip-blue { background: var(--tint-blue); color: var(--tint-blue-ink); }
+    .chip-pink { background: var(--tint-pink); color: var(--tint-pink-ink); }
+    .chip-green { background: var(--tint-green); color: var(--tint-green-ink); }
+    .chip-yellow { background: var(--tint-yellow); color: var(--tint-yellow-ink); }
+    .chip-accent { background: var(--accent-tint); color: var(--accent); border: 1px solid rgba(104,104,247,0.2); }
+    
+    .btn-portal {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: var(--r-md);
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s var(--ease);
+      border: 1px solid transparent;
+    }
+    .btn-portal:hover {
+      background: var(--ink-soft);
+      box-shadow: var(--sh-sm);
+    }
+
+    /* Main Container (100vh minus 60px header) */
+    main.viewport-content {
+      flex: 1;
+      height: calc(100vh - 60px);
+      max-height: calc(100vh - 60px);
+      overflow: hidden;
+      padding: 12px 20px 14px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* Header Context Banner */
+    .view-banner {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 16px;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .banner-title-group {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .banner-title-group h1 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .banner-title-group p {
+      font-size: 13px;
+      color: var(--body);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .banner-meta-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       VIEW 1: ALL 6 CANONICAL FORMULAS GRID (DEFAULT SCREEN, NO SCROLL)
+       ========================================================================== */
+    .grid-view-pane {
+      flex: 1;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      overflow: hidden;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .formula-card {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xl);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--sh-sm);
+      transition: all 0.2s var(--ease);
+      position: relative;
+      cursor: pointer;
+      min-width: 0;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .formula-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: var(--sh-md);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .card-formula-code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: var(--r-xs);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .f1-badge { background: #e0e7ff; color: #3730a3; }
+    .f2-badge { background: #fce7f3; color: #831843; }
+    .f3-badge { background: #dcfce7; color: #14532d; }
+    .f4-badge { background: #e0f2fe; color: #075985; }
+    .f5-badge { background: #fef3c7; color: #92400e; }
+    .f6-badge { background: #ede9fe; color: #5b21b6; }
+
+    .card-sla-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Math Formula Stage with Gradient Left Accent Bar */
+    .card-math-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-md);
+      padding: 8px 12px 8px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      position: relative;
+      scrollbar-width: none;
+    }
+    .card-math-box::-webkit-scrollbar {
+      display: none;
+    }
+    .card-math-box::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #6868f7 0%, #a855f7 50%, #ffa340 100%);
+      border-top-left-radius: var(--r-md);
+      border-bottom-left-radius: var(--r-md);
+    }
+    .card-math-box .katex {
+      font-size: 1.05rem;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    /* Plain English Description */
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--body);
+      line-height: 1.4;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* Parameter Meta Row & Footer */
+    .card-footer-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding-top: 8px;
+      border-top: 1px solid var(--hairline);
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .card-params-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .param-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .param-pill strong { color: var(--accent); font-family: var(--font-mono); }
+
+    .card-footer-action {
+      flex-shrink: 0;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-tint);
+      padding: 2px 7px;
+      border-radius: var(--r-xs);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      transition: all 0.15s var(--ease);
+    }
+    .formula-card:hover .card-footer-action {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       VIEW 2: WORKBENCH (SLIDERS ON LEFT, SPECS & VARIABLES ON RIGHT)
+       ========================================================================== */
+    .deepdive-pane {
+      flex: 1;
+      height: 100%;
+      display: none;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 20px;
+      overflow: hidden;
+    }
+
+    /* Left Column: Interactive Real-Time Simulator */
+    .sim-panel {
+      background: #ffffff;
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xxl);
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--sh-md);
+      overflow-y: auto;
+    }
+
+    .sim-header {
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .sim-header h3 {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sim-header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    .control-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .control-label-row label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .control-val-badge {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-tint);
+      padding: 2px 8px;
+      border-radius: var(--r-xs);
+    }
+
+    /* Enhanced Range Slider with Gradient Track Fill */
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 9999px;
+      background: #e9ecef;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      margin: 6px 0;
+      transition: background 0.1s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3.5px solid var(--accent);
+      box-shadow: 0 2px 6px rgba(104, 104, 247, 0.4);
+      cursor: pointer;
+      transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), border-color 0.15s var(--ease);
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+      border-color: var(--orange);
+      box-shadow: 0 4px 12px rgba(255, 163, 64, 0.5);
+    }
+
+    .sim-worked-math {
+      background: var(--surface-subtle);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-md);
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: var(--ink);
+      font-family: var(--font-mono);
+      word-break: break-all;
+      line-height: 1.45;
+    }
+
+    .sim-result-card {
+      background: linear-gradient(135deg, #ffffff 0%, var(--surface-subtle) 100%);
+      border: 1.5px solid var(--accent);
+      border-radius: var(--r-lg);
+      padding: 14px 18px;
+      margin-top: auto;
+      text-align: center;
+      box-shadow: var(--sh-xs);
+    }
+
+    .sim-result-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .sim-result-number {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      color: var(--ink);
+      line-height: 1.05;
+    }
+
+    .sim-result-status {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--r-pill);
+    }
+
+    /* Right Column: Formula Documentation & Variable Table */
+    .deepdive-card {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xxl);
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--sh-md);
+      overflow-y: auto;
+    }
+
+    .deepdive-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .deepdive-title-group h2 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+      margin-bottom: 3px;
+    }
+
+    .deepdive-title-group p {
+      font-size: 13.5px;
+      color: var(--body);
+    }
+
+    .large-math-stage {
+      background: #fdfdfe;
+      border: 1.5px solid #dcdcfe;
+      border-radius: var(--r-lg);
+      padding: 16px 22px 16px 26px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--sh-xs);
+      position: relative;
+    }
+    .large-math-stage::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: linear-gradient(180deg, #6868f7 0%, #a855f7 50%, #ffa340 100%);
+      border-top-left-radius: var(--r-lg);
+      border-bottom-left-radius: var(--r-lg);
+    }
+    .large-math-stage .katex {
+      font-size: 1.55rem;
+      color: var(--ink-deep);
+    }
+
+    .spec-block {
+      background: var(--surface-subtle);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-lg);
+      padding: 14px 18px;
+      margin-bottom: 14px;
+    }
+
+    .spec-block h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .spec-block p {
+      font-size: 13.5px;
+      color: var(--body);
+      line-height: 1.5;
+    }
+
+    /* Redesigned High-Clarity Variable Table */
+    .variable-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+      margin-top: 8px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      background: #ffffff;
+    }
+    .variable-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #495057;
+      padding: 9px 12px;
+      background: var(--surface-strong);
+      border-bottom: 1.5px solid var(--hairline);
+    }
+    .variable-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--hairline);
+      color: var(--body);
+      vertical-align: middle;
+    }
+    .variable-table tr:last-child td {
+      border-bottom: none;
+    }
+    .variable-table tr:hover td {
+      background: rgba(104, 104, 247, 0.03);
+    }
+    
+    .var-symbol-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-tint);
+      border: 1px solid rgba(104, 104, 247, 0.25);
+      border-radius: var(--r-xs);
+      padding: 3px 8px;
+      color: var(--primary);
+      font-size: 13.5px;
+      min-width: 58px;
+      box-shadow: 0 1px 2px rgba(104, 104, 247, 0.06);
+    }
+    .var-symbol-badge .katex {
+      font-size: 1.05rem;
+    }
+
+    .val-badge {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--r-xs);
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+    .val-badge-accent {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-screen">
+    <!-- Top Nav matching Jinder App -->
+    <header class="top-nav">
+      <div class="nav-left">
+        <div class="brand-logo">
+          <svg class="logo-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="#151531"/>
+            <rect x="8.5" y="9" width="13" height="18" rx="3" fill="#6868f7" transform="rotate(-12 15 18)"/>
+            <rect x="18.5" y="9" width="13" height="18" rx="3" fill="#ffa340" transform="rotate(12 25 18)"/>
+            <circle cx="20" cy="27" r="6" fill="#fff" stroke="#151531" stroke-width="1.5"/>
+            <path d="M17.4 27.1l1.8 1.8 3.4-3.6" stroke="#151531" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="logo-word">Jinder<span>.</span></div>
+        </div>
+        <div class="brand-divider"></div>
+        <div class="portal-tag">
+          <div class="portal-title">
+            Mathematical Engine
+            <span class="chip chip-accent" style="font-size: 10px; padding: 2px 7px; font-weight: 700;">ASD-STE100</span>
+          </div>
+          <div class="portal-sub">6 Deterministic Formulas • Talent & Employer Matching</div>
+        </div>
+      </div>
+
+      <!-- Segmented Tab Navigation -->
+      <nav class="tab-segmented-bar" id="formulaTabs">
+        <button class="tab-pill active" onclick="switchFormulaView('grid')" id="pill-grid">
+          <span>⊞</span> All 6 Formulas (Grid)
+        </button>
+        <button class="tab-pill" onclick="switchFormulaView('f1')" id="pill-f1">
+          <span class="pill-dot" style="color:#6868f7;"></span> F-01 SMF Coverage
+        </button>
+        <button class="tab-pill" onclick="switchFormulaView('f2')" id="pill-f2">
+          <span class="pill-dot" style="color:#e11d48;"></span> F-02 GSI & JRS
+        </button>
+        <button class="tab-pill" onclick="switchFormulaView('f3')" id="pill-f3">
+          <span class="pill-dot" style="color:#16a34a;"></span> F-03 JPI Proximity
+        </button>
+        <button class="tab-pill" onclick="switchFormulaView('f4')" id="pill-f4">
+          <span class="pill-dot" style="color:#0284c7;"></span> F-04 RMS Merit
+        </button>
+        <button class="tab-pill" onclick="switchFormulaView('f5')" id="pill-f5">
+          <span class="pill-dot" style="color:#d97706;"></span> F-05 FRS Talent Feed
+        </button>
+        <button class="tab-pill" onclick="switchFormulaView('f6')" id="pill-f6">
+          <span class="pill-dot" style="color:#7c3aed;"></span> F-06 TSS Employer Search
+        </button>
+      </nav>
+
+      <div class="nav-right">
+        <span class="chip chip-green">Zero PII Retention</span>
+        <span class="chip chip-blue">Deterministic SLA &lt; 5ms</span>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="viewport-content">
+      <!-- Banner Context Header -->
+      <div class="view-banner">
+        <div class="banner-title-group">
+          <h1 id="viewHeading">
+            Latest Canonical Mathematical Architecture (F-01 to F-06)
+          </h1>
+          <p id="viewSubheading">
+            Strictly bounded algebraic and statistical formulations in [0.0, 100.0] with zero black-box neural drift.
+          </p>
+        </div>
+        <div class="banner-meta-pills">
+          <span class="chip chip-blue">Australian National AI Ethics Framework</span>
+          <span class="chip chip-pink">Deterministic SLA &lt; 5ms</span>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           VIEW 1: ALL 6 CANONICAL FORMULAS ON SCREEN AT ONCE (3x2 GRID)
+           ===================================================================== -->
+      <div class="grid-view-pane" id="gridViewPane">
+        
+        <!-- CARD F-01 -->
+        <div class="formula-card" onclick="switchFormulaView('f1')">
+          <div>
+            <div class="card-top">
+              <span class="card-formula-code f1-badge">F-01 • SKILL COVERAGE</span>
+              <span class="card-sla-badge">0.82 ms SLA</span>
+            </div>
+            <h3 class="card-title">Skill Match Frequency & Coverage (SMF)</h3>
+            <div class="card-math-box">
+              $$\displaystyle SMF = \frac{\sum_{i \in S_{\text{match}}} w_i \cdot \min\left(1.0, \frac{L_{c,i}}{L_{j,i}}\right)}{\sum_{k \in S_{\text{job}}} w_k} \times 100$$
+            </div>
+            <p class="card-desc">
+              Weighted capability coverage separating mandatory requirements (w=2.0) from preferred skills (w=1.0) with verified proficiency level depth.
+            </p>
+          </div>
+          <div class="card-footer-wrap">
+            <div class="card-params-group">
+              <span class="param-pill">Must <strong>w = 2.0</strong></span>
+              <span class="param-pill">Nice <strong>w = 1.0</strong></span>
+              <span class="param-pill">Range <strong>[0, 100]</strong></span>
+            </div>
+            <div class="card-footer-action">Deep Dive ↗</div>
+          </div>
+        </div>
+
+        <!-- CARD F-02 -->
+        <div class="formula-card" onclick="switchFormulaView('f2')">
+          <div>
+            <div class="card-top">
+              <span class="card-formula-code f2-badge">F-02 • GAP SEVERITY</span>
+              <span class="card-sla-badge">0.45 ms SLA</span>
+            </div>
+            <h3 class="card-title">Gap Severity Index & Job Readiness (GSI / JRS)</h3>
+            <div class="card-math-box">
+              $$\displaystyle GSI = \sum_{g \in S_{\text{gaps}}} \beta_g \cdot \text{Severity}(g), \quad JRS = \max(0.0, SMF - GSI)$$
+            </div>
+            <p class="card-desc">
+              Penalises missing capabilities by categorising statutory blockers (β=15.0) vs learnable tools (β=5.0) to safeguard employers from foundational gaps.
+            </p>
+          </div>
+          <div class="card-footer-wrap">
+            <div class="card-params-group">
+              <span class="param-pill">Blocker <strong>β = 15</strong></span>
+              <span class="param-pill">Tool <strong>β = 5</strong></span>
+              <span class="param-pill">Severity <strong>L/5</strong></span>
+            </div>
+            <div class="card-footer-action">Deep Dive ↗</div>
+          </div>
+        </div>
+
+        <!-- CARD F-03 -->
+        <div class="formula-card" onclick="switchFormulaView('f3')">
+          <div>
+            <div class="card-top">
+              <span class="card-formula-code f3-badge">F-03 • PROXIMITY INDEX</span>
+              <span class="card-sla-badge">0.65 ms SLA</span>
+            </div>
+            <h3 class="card-title">Job Proximity Index (JPI) Mobility</h3>
+            <div class="card-math-box">
+              $$\displaystyle JPI = 100 \left[ 0.70 \frac{|S_A \cap S_B|}{|S_A \cup S_B|} + 0.30 \, \delta_{\text{domain}} \right]$$
+            </div>
+            <p class="card-desc">
+              Quantifies cross-career mobility across Australian ICT occupations using Jaccard vector similarity combined with domain taxonomy affinity modifiers.
+            </p>
+          </div>
+          <div class="card-footer-wrap">
+            <div class="card-params-group">
+              <span class="param-pill">Jaccard <strong>α = 0.70</strong></span>
+              <span class="param-pill">Domain <strong>δ ∈ {0, 0.5, 1}</strong></span>
+            </div>
+            <div class="card-footer-action">Deep Dive ↗</div>
+          </div>
+        </div>
+
+        <!-- CARD F-04 -->
+        <div class="formula-card" onclick="switchFormulaView('f4')">
+          <div>
+            <div class="card-top">
+              <span class="card-formula-code f4-badge">F-04 • RELATIVE MERIT</span>
+              <span class="card-sla-badge">1.10 ms SLA</span>
+            </div>
+            <h3 class="card-title">Relative Merit Score (RMS - Zero-PII Pool)</h3>
+            <div class="card-math-box">
+              $$\displaystyle Z_c = \frac{SMF_c - \mu}{\sigma + \epsilon}, \quad RMS_c = \frac{100}{1 + e^{-1.702 Z_c}}$$
+            </div>
+            <p class="card-desc">
+              Standardises an applicant's raw match score relative to the active requisition talent pool via Gaussian Z-score transformation with zero demographic attributes.
+            </p>
+          </div>
+          <div class="card-footer-wrap">
+            <div class="card-params-group">
+              <span class="param-pill">Gaussian <strong>Z-Score</strong></span>
+              <span class="param-pill">Scale <strong>1.702</strong></span>
+              <span class="param-pill">Bias <strong>0.000</strong></span>
+            </div>
+            <div class="card-footer-action">Deep Dive ↗</div>
+          </div>
+        </div>
+
+        <!-- CARD F-05 -->
+        <div class="formula-card" onclick="switchFormulaView('f5')">
+          <div>
+            <div class="card-top">
+              <span class="card-formula-code f5-badge">F-05 • TALENT FEED</span>
+              <span class="card-sla-badge">1.82 ms SLA</span>
+            </div>
+            <h3 class="card-title">Feed Ranking Score (FRS - Talent Feed)</h3>
+            <div class="card-math-box">
+              $$\displaystyle FRS = 0.45 SMF + 0.25 JRS + 0.20 \text{Exp} + 0.10 \text{Mode}$$
+            </div>
+            <p class="card-desc">
+              Ranks open market vacancies in the talent discovery feed, balancing skill coverage, net job readiness, experience brackets, and Australian work modes.
+            </p>
+          </div>
+          <div class="card-footer-wrap">
+            <div class="card-params-group">
+              <span class="param-pill">SMF <strong>45%</strong></span>
+              <span class="param-pill">JRS <strong>25%</strong></span>
+              <span class="param-pill">Exp <strong>20%</strong></span>
+            </div>
+            <div class="card-footer-action">Deep Dive ↗</div>
+          </div>
+        </div>
+
+        <!-- CARD F-06 -->
+        <div class="formula-card" onclick="switchFormulaView('f6')">
+          <div>
+            <div class="card-top">
+              <span class="card-formula-code f6-badge">F-06 • EMPLOYER SEARCH</span>
+              <span class="card-sla-badge">1.35 ms SLA</span>
+            </div>
+            <h3 class="card-title">Employer Talent Search Score (TSS)</h3>
+            <div class="card-math-box">
+              $$\displaystyle TSS = 0.40 SMF + 0.25 \text{Sen} + 0.20 \text{Cred} + 0.15 \text{Rec}$$
+            </div>
+            <p class="card-desc">
+              Ranks anonymised talent profiles for hiring employers: 40% capability match, 25% seniority level alignment, 20% Australian ICT credentials, 15% activity recency.
+            </p>
+          </div>
+          <div class="card-footer-wrap">
+            <div class="card-params-group">
+              <span class="param-pill">Match <strong>40%</strong></span>
+              <span class="param-pill">Level <strong>25%</strong></span>
+              <span class="param-pill">Creds <strong>20%</strong></span>
+            </div>
+            <div class="card-footer-action">Deep Dive ↗</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- =====================================================================
+           VIEW 2: WORKBENCH (SLIDERS ON LEFT, SPECS & VARIABLES ON RIGHT)
+           ===================================================================== -->
+      <div class="deepdive-pane" id="deepdivePane">
+        
+        <!-- Left Column: Interactive Real-Time Simulator with Gradient Sliders -->
+        <div class="sim-panel">
+          <div class="sim-header">
+            <h3>
+              <span>⚡</span> Live Interactive Parameter Workbench
+            </h3>
+            <p>Adjust live capability parameters to inspect instant deterministic score convergence.</p>
+          </div>
+
+          <div id="simControlsContainer">
+            <!-- Dynamic sliders injected via JS with live gradient tracks -->
+          </div>
+
+          <div class="sim-worked-math" id="simWorkedMath">
+            <!-- Numerical worked example -->
+          </div>
+
+          <div class="sim-result-card">
+            <div class="sim-result-label" id="simResultLabel">Calculated Canonical Score</div>
+            <div class="sim-result-number" id="simResultVal">78.6%</div>
+            <div class="sim-result-status chip-green" id="simResultBadge">Benchmark Case • Minh Tran (Silver Koala)</div>
+          </div>
+        </div>
+
+        <!-- Right Column: Formula Documentation & High-Clarity Variable Table -->
+        <div class="deepdive-card">
+          <div class="deepdive-header">
+            <div class="deepdive-title-group">
+              <span class="card-formula-code" id="ddCodeBadge">F-01</span>
+              <h2 id="ddTitle">Skill Match Frequency & Coverage (SMF)</h2>
+              <p id="ddSubtitle">Weighted coverage of mandatory and preferred capabilities.</p>
+            </div>
+            <button class="btn-portal" style="background: var(--surface-strong); color: var(--ink);" onclick="switchFormulaView('grid')">
+              ← Back to All 6 Formulas
+            </button>
+          </div>
+
+          <div class="large-math-stage" id="ddMathStage">
+            <!-- Rendered KaTeX Formula -->
+          </div>
+
+          <div class="spec-block">
+            <h3><span>📋</span> Canonical Architecture Specification</h3>
+            <p id="ddSpecText">
+              Computes weighted skill coverage between talent capabilities and role demands, assigning double weight (w=2.0) to mandatory competencies and single weight (w=1.0) to preferred tools.
+            </p>
+          </div>
+
+          <div class="spec-block" style="margin-bottom:0; flex: 1; display: flex; flex-direction: column;">
+            <h3><span>⚖️</span> Variable Definitions & Calibrated Values</h3>
+            <table class="variable-table">
+              <thead>
+                <tr>
+                  <th style="width: 130px;">Variable</th>
+                  <th>Mathematical Definition & Role</th>
+                  <th style="width: 190px;">Calibration & Value</th>
+                </tr>
+              </thead>
+              <tbody id="ddVarTableBody">
+                <!-- Injected via JS with KaTeX badges and styled tags -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CANONICAL FORMULAS DATA (1:1 with Document/architecture/FORMULA_ARCHITECTURE_DETAIL.md)
+    // =========================================================================
+    const FORMULAS_DATA = {
+      f1: {
+        code: 'F-01 • SKILL COVERAGE',
+        badgeClass: 'f1-badge',
+        title: 'Skill Match Frequency & Coverage (SMF)',
+        subtitle: 'Weighted capability coverage separating mandatory from preferred skills.',
+        latex: '\\displaystyle SMF = \\frac{\\sum_{i \\in S_{\\text{match}}} w_i \\cdot \\min\\left(1.0, \\frac{L_{c,i}}{L_{j,i}}\\right)}{\\sum_{k \\in S_{\\text{job}}} w_k} \\times 100',
+        specText: 'Computes the weighted skill coverage between talent capabilities and job demands. Mandatory requirements (must: true) are assigned w=2.0; preferred requirements (must: false) are assigned w=1.0. Partial credit is granted proportionally if a talent level is below the required level, but capped at 1.0 if exceeded.',
+        vars: [
+          { math: 'S_{\\text{job}}', desc: 'Set of all capability requirements demanded by the employer requisition', calib: 'Total Requisition Skills' },
+          { math: 'S_{\\text{match}}', desc: 'Intersection subset of common verified capabilities: S_talent ∩ S_job', calib: 'Verified Overlap Set' },
+          { math: 'w_i', desc: 'Skill weighting factor: mandatory (must) vs preferred (nice-to-have)', calib: 'w = 2.0 (must), 1.0 (nice)' },
+          { math: '\\frac{L_{c,i}}{L_{j,i}}', desc: 'Proficiency depth ratio: verified talent level over role required level', calib: 'Levels ∈ [1, 5] (Cap: 1.0)' }
+        ],
+        controls: [
+          { id: 'must_matches', label: 'Mandatory Skills Matched (out of 3 required, w=2.0)', min: 0, max: 3, val: 3, step: 1, unit: ' skills' },
+          { id: 'must_depth', label: 'Mandatory Skills Avg Level Ratio (L_c / L_j)', min: 50, max: 100, val: 92, step: 1, unit: '%' },
+          { id: 'nice_matches', label: 'Preferred Skills Matched (out of 1 required, w=1.0)', min: 0, max: 1, val: 0, step: 1, unit: ' skills' }
+        ],
+        compute: function(vals) {
+          const totalWeight = 7.0;
+          const matchWeight = (vals.must_matches * 2.0 * (vals.must_depth / 100)) + (vals.nice_matches * 1.0);
+          const smf = Math.min(100.0, Math.max(0.0, (matchWeight / totalWeight) * 100));
+          const pct = smf.toFixed(1);
+          return {
+            resultText: pct + '%',
+            worked: 'SMF = [(' + vals.must_matches + ' × 2.0 × ' + (vals.must_depth / 100).toFixed(2) + ') + (' + vals.nice_matches + ' × 1.0)] / 7.0 × 100 = ' + matchWeight.toFixed(2) + ' / 7.0 × 100 = ' + pct + '%',
+            badge: smf >= 75 ? 'Strong Capability Match' : (smf >= 50 ? 'Moderate Alignment' : 'Substantial Gap'),
+            badgeClass: smf >= 75 ? 'chip-green' : (smf >= 50 ? 'chip-yellow' : 'chip-pink')
+          };
+        }
+      },
+      f2: {
+        code: 'F-02 • GAP SEVERITY',
+        badgeClass: 'f2-badge',
+        title: 'Gap Severity Index (GSI) & Job Readiness Score (JRS)',
+        subtitle: 'Statutory blocker detection with separate learnable tool mitigation.',
+        latex: '\\displaystyle GSI = \\sum_{g \\in S_{\\text{gaps}}} \\beta_g \\cdot \\text{Severity}(g), \\quad JRS = \\max(0.0, SMF - GSI)',
+        specText: 'Penalises talent profiles for missing requirements by categorising gaps into Statutory Blockers (mandatory skills/licenses, β=15.0) versus Learnable Tools (frameworks learnable on the job, β=5.0). Severity is scaled by required proficiency level: Severity(g) = L_j,g / 5.0.',
+        vars: [
+          { math: 'S_{\\text{gaps}}', desc: 'Unmet role requirements: S_job \\ S_talent', calib: 'Missing Capability Set' },
+          { math: '\\beta_{\\text{blocker}}', desc: 'Statutory blocker penalty coefficient for mandatory skills / licences', calib: 'Fixed β = 15.0 pts' },
+          { math: '\\beta_{\\text{tool}}', desc: 'Learnable tool penalty coefficient for frameworks acquirable on the job', calib: 'Fixed β = 5.0 pts' },
+          { math: 'JRS', desc: 'Net Job Readiness Score: guaranteed non-negative via max(0, SMF - GSI)', calib: 'Range: [0.0, 100.0]' }
+        ],
+        controls: [
+          { id: 'smf_in', label: 'Base Capability Match (SMF)', min: 40, max: 100, val: 78.6, step: 0.1, unit: '%' },
+          { id: 'blockers', label: 'Missing Statutory Blockers (must: true, β=15.0)', min: 0, max: 2, val: 0, step: 1, unit: ' gaps' },
+          { id: 'learnables', label: 'Missing Learnable Tools (must: false, β=5.0)', min: 0, max: 3, val: 1, step: 1, unit: ' gaps' }
+        ],
+        compute: function(vals) {
+          const gsi = (vals.blockers * 15.0 * (4.0 / 5.0)) + (vals.learnables * 5.0 * (3.0 / 5.0));
+          const jrs = Math.max(0.0, vals.smf_in - gsi);
+          return {
+            resultText: jrs.toFixed(1) + '%',
+            worked: 'GSI = (' + vals.blockers + ' × 15.0 × 0.8) + (' + vals.learnables + ' × 5.0 × 0.6) = ' + gsi.toFixed(1) + ' pts | JRS = ' + vals.smf_in.toFixed(1) + ' - ' + gsi.toFixed(1) + ' = ' + jrs.toFixed(1) + '%',
+            badge: vals.blockers === 0 ? 'Job Ready • No Statutory Blockers' : 'Critical Blocker Detected',
+            badgeClass: vals.blockers === 0 ? 'chip-green' : 'chip-pink'
+          };
+        }
+      },
+      f3: {
+        code: 'F-03 • PROXIMITY INDEX',
+        badgeClass: 'f3-badge',
+        title: 'Job Proximity Index (JPI) / Career Pathway Mobility',
+        subtitle: 'Cross-career mobility and skill transferability across ICT occupations.',
+        latex: '\\displaystyle JPI(J_A, J_B) = 100 \\times \\left( \\alpha \\cdot \\frac{|S_A \\cap S_B|}{|S_A \\cup S_B|} + (1 - \\alpha) \\cdot \\delta(\\text{Domain}_A, \\text{Domain}_B) \\right)',
+        specText: 'Measures career mobility and skill transferability between two job roles using Jaccard vector distance with domain affinity modifiers (α=0.70). If jobs share the same ICT domain, δ=1.0; if related (e.g. Software Engineering and Data), δ=0.5; otherwise δ=0.0.',
+        vars: [
+          { math: '\\frac{|S_A \\cap S_B|}{|S_A \\cup S_B|}', desc: 'Jaccard capability intersection over union across two ICT job requisitions', calib: 'Continuous Set Ratio [0, 1]' },
+          { math: '\\alpha', desc: 'Balance weighting parameter between skill overlap and domain affinity', calib: 'Fixed constant α = 0.70' },
+          { math: '\\delta_{\\text{domain}}', desc: 'Domain taxonomic affinity modifier (Software, Data, AI/ML)', calib: '1.0 (Same), 0.5 (Related)' },
+          { math: 'JPI', desc: 'Cross-role proximity index and career pathway transferability', calib: 'Range: [0.0, 100.0]' }
+        ],
+        controls: [
+          { id: 'jaccard', label: 'Jaccard Skill Overlap Ratio (|S_A ∩ S_B| / |S_A ∪ S_B|)', min: 10, max: 90, val: 55, step: 1, unit: '%' },
+          { id: 'domain_rel', label: 'Domain Relationship (δ: 100% Same, 50% Related)', min: 0, max: 100, val: 50, step: 50, unit: '%' }
+        ],
+        compute: function(vals) {
+          const j = vals.jaccard / 100;
+          const d = vals.domain_rel / 100;
+          const jpi = 100 * (0.70 * j + 0.30 * d);
+          return {
+            resultText: jpi.toFixed(1) + '%',
+            worked: 'JPI = 100 × [0.70 × ' + j.toFixed(2) + ' + 0.30 × ' + d.toFixed(2) + '] = 100 × [' + (0.70 * j).toFixed(3) + ' + ' + (0.30 * d).toFixed(3) + '] = ' + jpi.toFixed(1) + '%',
+            badge: jpi >= 60 ? 'High Pathway Mobility' : 'Moderate Transition Distance',
+            badgeClass: jpi >= 60 ? 'chip-green' : 'chip-blue'
+          };
+        }
+      },
+      f4: {
+        code: 'F-04 • RELATIVE MERIT',
+        badgeClass: 'f4-badge',
+        title: 'Relative Merit Score (RMS - Zero-PII Pool Benchmarking)',
+        subtitle: 'Applicant standardization relative to requisition cohort via Gaussian CDF.',
+        latex: '\\displaystyle Z_c = \\frac{SMF_c - \\mu_{\\text{pool}}}{\\sigma_{\\text{pool}} + \\epsilon}, \\quad RMS_c = \\frac{1}{1 + e^{-1.702 \\cdot Z_c}} \\times 100',
+        specText: 'Standardises an applicant raw match score relative to the current applicant pool for that specific job requisition, utilizing a Gaussian Z-score transformation with logistic CDF approximation. Excludes all demographic attributes to guarantee zero bias.',
+        vars: [
+          { math: 'SMF_c', desc: 'Raw capability match score of applicant c from Formula F-01', calib: 'Raw Score ∈ [0.0, 100.0]' },
+          { math: '\\mu_{\\text{pool}}', desc: 'Arithmetic mean SMF score across all active applicants for the specific role', calib: 'Cohort Statistical Mean' },
+          { math: '\\sigma_{\\text{pool}}', desc: 'Standard deviation of applicant scores reflecting cohort capability spread', calib: 'Cohort Spread (σ > 0)' },
+          { math: 'RMS_c', desc: 'Standardised percentile merit score computed via logistic Gaussian CDF', calib: 'Range: [0.0, 100.0]' }
+        ],
+        controls: [
+          { id: 'smf_cand', label: 'Talent Raw Match (SMF_c)', min: 50, max: 95, val: 78.6, step: 0.1, unit: '%' },
+          { id: 'mu_pool', label: 'Pool Average Score (μ_pool)', min: 50, max: 80, val: 64.0, step: 0.5, unit: '%' },
+          { id: 'sigma_pool', label: 'Pool Standard Deviation (σ_pool)', min: 5, max: 20, val: 12.0, step: 0.5, unit: ' pts' }
+        ],
+        compute: function(vals) {
+          const z = (vals.smf_cand - vals.mu_pool) / vals.sigma_pool;
+          const rms = (1 / (1 + Math.exp(-1.702 * z))) * 100;
+          return {
+            resultText: rms.toFixed(1) + '%',
+            worked: 'Z = (' + vals.smf_cand.toFixed(1) + ' - ' + vals.mu_pool.toFixed(1) + ') / ' + vals.sigma_pool.toFixed(1) + ' = +' + z.toFixed(2) + 'σ | RMS = 1 / [1 + e^(-1.702 × ' + z.toFixed(2) + ')] × 100 = ' + rms.toFixed(1) + '%',
+            badge: rms >= 80 ? 'Top Requisition Tier (Top Quintile)' : (rms >= 50 ? 'Above Cohort Average' : 'Below Median'),
+            badgeClass: rms >= 80 ? 'chip-green' : (rms >= 50 ? 'chip-blue' : 'chip-yellow')
+          };
+        }
+      },
+      f5: {
+        code: 'F-05 • TALENT FEED',
+        badgeClass: 'f5-badge',
+        title: 'Feed Ranking Score (FRS - Personalised Talent Feed)',
+        subtitle: 'Multi-objective ranking for talent opportunity discovery feed.',
+        latex: '\\displaystyle FRS = 0.45 \\cdot SMF + 0.25 \\cdot JRS + 0.20 \\cdot \\text{ExpFit} + 0.10 \\cdot \\text{WorkMode}',
+        specText: 'Ranks job cards in the talent discovery feed, balancing core skill coverage (45%), net job readiness (25%), experience bracket alignment (20%), and Australian work mode preferences (10% onsite/hybrid/remote).',
+        vars: [
+          { math: 'w_1 \\cdot SMF', desc: 'Core capability coverage contribution in discovery feed', calib: 'Weight w1 = 0.45 (45%)' },
+          { math: 'w_2 \\cdot JRS', desc: 'Net job readiness contribution penalising statutory blockers', calib: 'Weight w2 = 0.25 (25%)' },
+          { math: 'w_3 \\cdot \\text{ExpFit}', desc: 'Experience bracket Gaussian alignment (minYears to maxYears)', calib: 'Weight w3 = 0.20 (20%)' },
+          { math: 'w_4 \\cdot \\text{Mode}', desc: 'Australian work mode alignment (Onsite, Hybrid, Remote)', calib: 'Weight w4 = 0.10 (10%)' }
+        ],
+        controls: [
+          { id: 'frs_smf', label: 'Core Skill Coverage (SMF)', min: 40, max: 100, val: 78.6, step: 0.1, unit: '%' },
+          { id: 'frs_jrs', label: 'Job Readiness Score (JRS)', min: 40, max: 100, val: 75.6, step: 0.1, unit: '%' },
+          { id: 'frs_exp', label: 'Experience Bracket Fit (ExpFit)', min: 50, max: 100, val: 90.0, step: 1, unit: '%' },
+          { id: 'frs_mode', label: 'Work Mode Affinity (Hybrid / Remote)', min: 50, max: 100, val: 100.0, step: 5, unit: '%' }
+        ],
+        compute: function(vals) {
+          const frs = (0.45 * vals.frs_smf) + (0.25 * vals.frs_jrs) + (0.20 * vals.frs_exp) + (0.10 * vals.frs_mode);
+          return {
+            resultText: frs.toFixed(1) + '%',
+            worked: 'FRS = (0.45 × ' + vals.frs_smf.toFixed(1) + ') + (0.25 × ' + vals.frs_jrs.toFixed(1) + ') + (0.20 × ' + vals.frs_exp.toFixed(1) + ') + (0.10 × ' + vals.frs_mode.toFixed(1) + ') = ' + frs.toFixed(1) + '%',
+            badge: frs >= 80 ? 'Prime Feed Placement' : 'Recommended Opportunity',
+            badgeClass: frs >= 80 ? 'chip-green' : 'chip-blue'
+          };
+        }
+      },
+      f6: {
+        code: 'F-06 • EMPLOYER SEARCH',
+        badgeClass: 'f6-badge',
+        title: 'Employer Talent Search Score (TSS)',
+        subtitle: 'Anonymised talent profile ranking for hiring employers.',
+        latex: '\\displaystyle TSS = 0.40 \\cdot SMF + 0.25 \\cdot \\text{Seniority} + 0.20 \\cdot \\text{Credentials} + 0.15 \\cdot \\text{Recency}',
+        specText: 'Ranks anonymous talent profiles for employers without revealing raw PII: 40% capability match (SMF), 25% seniority level alignment (|Level_talent - Level_job|), 20% Australian ICT certifications/awards, and 15% activity recency (90-day exponential decay).',
+        vars: [
+          { math: 'w_{\\text{SMF}}', desc: 'Anonymous capability match factor in employer search ranking', calib: 'Weight w = 0.40 (40%)' },
+          { math: '\\text{Seniority}', desc: 'Seniority alignment penalty: 1.0 - 0.2 × |Level_talent - Level_job|', calib: 'Weight w = 0.25 (25%)' },
+          { math: '\\text{Credentials}', desc: 'Verified Australian ICT certifications and recognized hackathon awards', calib: 'Weight w = 0.20 (20%)' },
+          { math: '\\text{Recency}', desc: 'Platform activity recency factor with exponential decay over 90 days', calib: 'Weight w = 0.15 (15%)' }
+        ],
+        controls: [
+          { id: 'tss_smf', label: 'Talent Capability Match (SMF)', min: 40, max: 100, val: 78.6, step: 0.1, unit: '%' },
+          { id: 'tss_sen', label: 'Seniority Level Alignment', min: 40, max: 100, val: 80.0, step: 5, unit: '%' },
+          { id: 'tss_cred', label: 'Verified Certifications / Awards', min: 0, max: 100, val: 90.0, step: 5, unit: '%' },
+          { id: 'tss_rec', label: 'Platform Activity Recency (90d)', min: 40, max: 100, val: 95.0, step: 5, unit: '%' }
+        ],
+        compute: function(vals) {
+          const tss = (0.40 * vals.tss_smf) + (0.25 * vals.tss_sen) + (0.20 * vals.tss_cred) + (0.15 * vals.tss_rec);
+          return {
+            resultText: tss.toFixed(1) + '%',
+            worked: 'TSS = (0.40 × ' + vals.tss_smf.toFixed(1) + ') + (0.25 × ' + vals.tss_sen.toFixed(1) + ') + (0.20 × ' + vals.tss_cred.toFixed(1) + ') + (0.15 × ' + vals.tss_rec.toFixed(1) + ') = ' + tss.toFixed(1) + '%',
+            badge: tss >= 80 ? 'Featured Shortlist Talent' : 'Qualified Talent',
+            badgeClass: tss >= 80 ? 'chip-green' : 'chip-blue'
+          };
+        }
+      }
+    };
+
+    let activeFormulaId = 'f1';
+
+    // Helper: Update slider track gradient fill dynamically
+    function updateSliderTrackGradient(el) {
+      if (!el) return;
+      const min = parseFloat(el.min) || 0;
+      const max = parseFloat(el.max) || 100;
+      const val = parseFloat(el.value) || min;
+      const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+      // Vibrant Jinder gradient (Indigo -> Purple -> Coral) on the left side of thumb
+      el.style.background = `linear-gradient(to right, #6868f7 0%, #a855f7 ${pct * 0.5}%, #ffa340 ${pct}%, #e9ecef ${pct}%, #e9ecef 100%)`;
+    }
+
+    // =========================================================================
+    // VIEW SWITCHING (GRID VIEW vs DEEP DIVE WORKBENCH)
+    // =========================================================================
+    function switchFormulaView(viewMode) {
+      const gridPane = document.getElementById('gridViewPane');
+      const deepdivePane = document.getElementById('deepdivePane');
+      const allPills = document.querySelectorAll('.tab-pill');
+      
+      allPills.forEach(p => p.classList.remove('active'));
+
+      if (viewMode === 'grid') {
+        gridPane.style.display = 'grid';
+        deepdivePane.style.display = 'none';
+        document.getElementById('pill-grid').classList.add('active');
+        document.getElementById('viewHeading').textContent = 'Latest Canonical Mathematical Architecture (F-01 to F-06)';
+        document.getElementById('viewSubheading').textContent = 'Strictly bounded algebraic and statistical formulations in [0.0, 100.0] with zero black-box neural drift.';
+      } else {
+        gridPane.style.display = 'none';
+        deepdivePane.style.display = 'grid';
+        const activePill = document.getElementById('pill-' + viewMode);
+        if (activePill) activePill.classList.add('active');
+        activeFormulaId = viewMode;
+        loadDeepDiveFormula(viewMode);
+      }
+    }
+
+    function loadDeepDiveFormula(fid) {
+      const data = FORMULAS_DATA[fid];
+      if (!data) return;
+
+      document.getElementById('viewHeading').textContent = data.title;
+      document.getElementById('viewSubheading').textContent = data.subtitle;
+
+      document.getElementById('ddCodeBadge').textContent = data.code;
+      document.getElementById('ddCodeBadge').className = 'card-formula-code ' + data.badgeClass;
+      document.getElementById('ddTitle').textContent = data.title;
+      document.getElementById('ddSubtitle').textContent = data.subtitle;
+      document.getElementById('ddSpecText').textContent = data.specText;
+
+      // Render KaTeX in large math stage
+      const mathStage = document.getElementById('ddMathStage');
+      if (window.katex) {
+        katex.render(data.latex, mathStage, { displayMode: true, throwOnError: false });
+      } else {
+        mathStage.innerHTML = '$$' + data.latex + '$$';
+      }
+
+      // Render Variable Table with crisp KaTeX badges
+      const varTableBody = document.getElementById('ddVarTableBody');
+      varTableBody.innerHTML = '';
+      data.vars.forEach(v => {
+        const tr = document.createElement('tr');
+        
+        let mathHtml = v.math;
+        if (window.katex) {
+          try {
+            mathHtml = katex.renderToString(v.math, { displayMode: false, throwOnError: false });
+          } catch(e) {
+            mathHtml = v.math;
+          }
+        }
+        
+        tr.innerHTML = `
+          <td><span class="var-symbol-badge">${mathHtml}</span></td>
+          <td style="color:var(--ink); font-weight:500;">${v.desc}</td>
+          <td><span class="val-badge val-badge-accent">${v.calib}</span></td>
+        `;
+        varTableBody.appendChild(tr);
+      });
+
+      // Render Simulator Controls
+      const ctrlContainer = document.getElementById('simControlsContainer');
+      ctrlContainer.innerHTML = '';
+      data.controls.forEach(c => {
+        const group = document.createElement('div');
+        group.className = 'control-group';
+        group.innerHTML = `
+          <div class="control-label-row">
+            <label for="ctrl_${c.id}">${c.label}</label>
+            <span class="control-val-badge" id="valLabel_${c.id}">${c.val}${c.unit}</span>
+          </div>
+          <input type="range" id="ctrl_${c.id}" min="${c.min}" max="${c.max}" value="${c.val}" step="${c.step || 1}" oninput="updateSimulation('${fid}', this)">
+        `;
+        ctrlContainer.appendChild(group);
+
+        const inputEl = group.querySelector('input');
+        updateSliderTrackGradient(inputEl);
+      });
+
+      updateSimulation(fid);
+    }
+
+    function updateSimulation(fid, changedInput) {
+      const data = FORMULAS_DATA[fid];
+      if (!data) return;
+
+      if (changedInput) {
+        updateSliderTrackGradient(changedInput);
+      }
+
+      const currentVals = {};
+      data.controls.forEach(c => {
+        const el = document.getElementById(`ctrl_${c.id}`);
+        if (el) {
+          const num = parseFloat(el.value);
+          currentVals[c.id] = num;
+          const lbl = document.getElementById(`valLabel_${c.id}`);
+          if (lbl) lbl.textContent = num + c.unit;
+          if (!changedInput) {
+            updateSliderTrackGradient(el);
+          }
+        }
+      });
+
+      const res = data.compute(currentVals);
+      document.getElementById('simResultVal').textContent = res.resultText;
+      document.getElementById('simWorkedMath').textContent = res.worked;
+      const badge = document.getElementById('simResultBadge');
+      badge.textContent = res.badge;
+      badge.className = 'sim-result-status ' + res.badgeClass;
+    }
+
+    // Initialize KaTeX on Page Load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    });
+  </script>
+</body>
+</html>

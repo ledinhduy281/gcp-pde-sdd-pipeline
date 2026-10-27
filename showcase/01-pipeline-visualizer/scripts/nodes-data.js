@@ -1,7 +1,7 @@
 window.PIPELINE_NODES = {
   simulator: {
     icon: "💻",
-    title: "Synthetic Event Simulator",
+    title: "Excelerate-Jinder Event Producer (F-01..F-06)",
     tier_vi: "MIỄN PHÍ 100% (Chạy trên máy hoặc Cloud Run)",
     tier_en: "100% FREE (Runs locally or on Cloud Run)",
     analogy_vi: "Hãy tưởng tượng đây là hàng ngàn khách hàng đang lướt web, bấm 'Thêm vào giỏ hàng', 'Thanh toán' và tài xế đang phát tín hiệu GPS mỗi giây.",
@@ -168,7 +168,7 @@ window.PIPELINE_NODES = {
   },
   bigquery: {
     icon: "🏛️",
-    title: "BigQuery Data Warehouse + Dataform (SQLX)",
+    title: "BigQuery Star Schema (Jinder dim_jobs & dim_customers)",
     tier_vi: "LUÔN BẬT — $0.00/tháng (Miễn phí 10GB lưu trữ + 1TB query/tháng)",
     tier_en: "ALWAYS ON — $0.00/month (10GB storage + 1TB query/month free)",
     analogy_vi: "BigQuery là siêu thư viện không cần quản trị máy chủ. Nhờ chia ngăn theo Ngày (Partitioning) và xếp theo Mã khách hàng (Clustering), khi bạn tìm đơn hàng hôm nay, nó chỉ mở đúng ngăn hôm nay thay vì lục tung cả thư viện — vừa nhanh vừa không tốn tiền!",
@@ -210,7 +210,7 @@ window.PIPELINE_NODES = {
   },
   governance: {
     icon: "🔐",
-    title: "IAM, Cloud KMS (CMEK) & Policy Tags (Column Security)",
+    title: "Jinder Zero-PII (REQ-A07) Policy Tags, IAM & KMS",
     tier_vi: "LUÔN BẬT — $0.00/tháng (Chi phí KMS chỉ vài xu)",
     tier_en: "ALWAYS ON — ~$0.00/month",
     analogy_vi: "Giống như hệ thống thẻ từ trong tòa nhà ngân hàng: Nhân viên giao nhận chỉ vào được sảnh Raw; nhân viên phân tích xem được bảng doanh thu nhưng cột Email/SĐT khách hàng sẽ tự động bị làm mờ (Policy Tag) nếu không có quyền đặc biệt!",
@@ -231,7 +231,7 @@ window.PIPELINE_NODES = {
   },
   bqml: {
     icon: "🧠",
-    title: "BigQuery ML (In-Warehouse Machine Learning)",
+    title: "BigQuery ML (Jinder Shortlist & Demand AI)",
     tier_vi: "LUÔN BẬT — Nằm trong Free Tier của BigQuery",
     tier_en: "ALWAYS ON — Included in BigQuery Free Tier",
     analogy_vi: "Thông thường muốn làm AI bạn phải bê dữ liệu ra ngoài và viết hàng trăm dòng code Python. Với BigQuery ML, bạn chỉ cần viết đúng 10 dòng lệnh SQL quen thuộc ngay trong kho dữ liệu để dạy máy dự đoán khách hàng nào sắp bỏ đi!",

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Streaming Dataflow / Apache Beam Pipeline Logic (Spec 02 & Spec 05).
+"""Excelerate-Jinder Streaming Dataflow / Apache Beam Pipeline Logic (Spec 02 & Spec 05).
 
 Implements:
 1. JSON Parsing & Schema Contract Validation with Dead-Letter Queue (DLQ) routing.
-2. Anti-Hotspotting Salted Row Key calculation for Cloud Bigtable.
-3. Windowed aggregation helpers for PDE exam readiness.
+2. Jinder Behavioural Ranking Feedback Loop adjustment:
+   FRS*(J | C) = min(100, FRS(J | C) * (1 + delta_save - delta_ignore))
+3. Anti-Hotspotting Salted Row Key calculation for Cloud Bigtable.
 """
 
 from __future__ import annotations
@@ -14,21 +15,45 @@ import hashlib
 import json
 from typing import Any, Tuple
 
-ALLOWED_EVENT_TYPES = {"PAGE_VIEW", "ADD_TO_CART", "CHECKOUT", "GPS_PING"}
+ALLOWED_EVENT_TYPES = {
+    "PAGE_VIEW",
+    "ADD_TO_CART",
+    "CHECKOUT",
+    "GPS_PING",
+    "JOB_VIEW",
+    "JOB_SAVE",
+    "JOB_IGNORE",
+    "JOB_APPLY",
+}
 REQUIRED_FIELDS = ("event_id", "event_timestamp", "user_id", "event_type")
 MAX_EPOCH_MS = 9_999_999_999_999
+
+
+def compute_jinder_behavioral_frs(
+    base_frs: float,
+    saved_same_employer: bool = False,
+    saved_same_domain: bool = False,
+    ignored_employer_count: int = 0,
+) -> float:
+    """Implements Jinder Section 3 Behavioural Ranking Feedback Loop:
+    FRS*(J|C) = min(100, FRS(J|C) * (1 + delta_save - delta_ignore))
+    """
+    delta_save = 0.0
+    if saved_same_employer:
+        delta_save += 0.10
+    elif saved_same_domain:
+        delta_save += 0.05
+
+    delta_ignore = 0.25 if ignored_employer_count >= 3 else 0.0
+    adjusted = base_frs * (1.0 + delta_save - delta_ignore)
+    return round(min(100.0, max(0.0, adjusted)), 2)
 
 
 def validate_and_parse_event(
     raw_payload: str,
     ingestion_time: dt.datetime | None = None,
 ) -> Tuple[bool, dict[str, Any]]:
-    """Validates a raw JSON event string against SPEC-02 Contract 1.
-
-    Returns:
-        (True, normalized_event_dict) if valid.
-        (False, dlq_error_dict) if malformed or violating business constraints.
-    """
+    """Validates a raw JSON event string against SPEC-02 Contract 1."""
     now_iso = (ingestion_time or dt.datetime.now(dt.timezone.utc)).isoformat().replace("+00:00", "Z")
 
     try:
@@ -82,7 +107,6 @@ def validate_and_parse_event(
     else:
         amount_val = 0.0
 
-    # Validate ISO-8601 timestamp
     ts_str = str(payload["event_timestamp"])
     try:
         dt.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
@@ -100,8 +124,14 @@ def validate_and_parse_event(
         "ingestion_timestamp": now_iso,
         "user_id": str(payload["user_id"]),
         "session_id": payload.get("session_id"),
+        "job_id": payload.get("job_id"),
+        "anzsco_code": payload.get("anzsco_code"),
         "event_type": event_type,
         "order_amount": amount_val,
+        "frs_score": payload.get("frs_score"),
+        "smf_score": payload.get("smf_score"),
+        "gsi_score": payload.get("gsi_score"),
+        "tss_score": payload.get("tss_score"),
         "customer_email": payload.get("customer_email"),
         "device_os": payload.get("device_os"),
         "geo_lat": payload.get("geo_lat"),

@@ -25,6 +25,11 @@ ENV/
 dist/
 build/
 *.egg-info/
+*.db
+*.db-wal
+*.db-shm
+var/
+uploads/
 
 # GCP / Credentials (NEVER COMMIT KEYS)
 *credentials*.json

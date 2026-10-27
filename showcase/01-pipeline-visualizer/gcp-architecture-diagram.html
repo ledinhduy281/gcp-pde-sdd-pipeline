@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Cloud Platform — Excelerate-Jinder Architecture Diagram</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .diagram-canvas {
+      position: relative;
+      width: 100%;
+      max-width: 1560px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+    }
+    .anim-toggle-btn {
+      position: absolute;
+      top: 14px;
+      right: 36px;
+      background: #ffffff;
+      border: 1px solid #dadce0;
+      color: #1a73e8;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .anim-toggle-btn:hover {
+      background: #f1f3f4;
+      border-color: #1a73e8;
+    }
+    .anim-toggle-btn.active {
+      background: #e8f0fe;
+      border-color: #1a73e8;
+    }
+    @keyframes dashFlow {
+      to {
+        stroke-dashoffset: -40;
+      }
+    }
+    .flowing-line {
+      stroke-dasharray: 8, 6 !important;
+      stroke-width: 2.4px !important;
+      animation: dashFlow 0.9s linear infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="diagram-canvas">
+    <button class="anim-toggle-btn active" id="btn-toggle-anim">Pause Flow Animation</button>
+    <svg id="gcp-arch-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 940" width="100%" height="100%">
+  <defs>
+    <!-- Standard Google Blue Arrowhead -->
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#4285f4" />
+    </marker>
+    <!-- Red DLQ Arrowhead -->
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#ea4335" />
+    </marker>
+    <!-- Subtle Drop Shadow for White Entity Boxes -->
+    <filter id="box-shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="#000000" flood-opacity="0.12" />
+    </filter>
+
+    <!-- Reusable Blue GCP Hexagon Base -->
+    <g id="gcp-hex">
+      <polygon points="22,0 40,10.5 40,31.5 22,42 4,31.5 4,10.5" fill="#4285f4" />
+      <polygon points="22,0 40,10.5 40,31.5 22,42" fill="#3367d6" opacity="0.35" />
+    </g>
+
+    <!-- GCP Icon: Pub/Sub -->
+    <g id="icon-pubsub">
+      <use href="#gcp-hex" />
+      <circle cx="22" cy="21" r="4.2" fill="#ffffff" />
+      <circle cx="22" cy="10" r="2.6" fill="#ffffff" />
+      <circle cx="31.5" cy="15.5" r="2.6" fill="#ffffff" />
+      <circle cx="31.5" cy="26.5" r="2.6" fill="#ffffff" />
+      <circle cx="22" cy="32" r="2.6" fill="#ffffff" />
+      <circle cx="12.5" cy="26.5" r="2.6" fill="#ffffff" />
+      <circle cx="12.5" cy="15.5" r="2.6" fill="#ffffff" />
+      <line x1="22" y1="12.6" x2="22" y2="16.8" stroke="#ffffff" stroke-width="1.6" />
+      <line x1="29.2" y1="16.8" x2="25.6" y2="18.9" stroke="#ffffff" stroke-width="1.6" />
+      <line x1="29.2" y1="25.2" x2="25.6" y2="23.1" stroke="#ffffff" stroke-width="1.6" />
+      <line x1="22" y1="29.4" x2="22" y2="25.2" stroke="#ffffff" stroke-width="1.6" />
+      <line x1="14.8" y1="25.2" x2="18.4" y2="23.1" stroke="#ffffff" stroke-width="1.6" />
+      <line x1="14.8" y1="16.8" x2="18.4" y2="18.9" stroke="#ffffff" stroke-width="1.6" />
+    </g>
+
+    <!-- GCP Icon: Dataflow -->
+    <g id="icon-dataflow">
+      <use href="#gcp-hex" />
+      <polygon points="22,9 31,15 31,27 22,33 13,27 13,15" fill="none" stroke="#ffffff" stroke-width="1.8" />
+      <circle cx="22" cy="21" r="3.2" fill="#ffffff" />
+      <line x1="22" y1="9" x2="22" y2="17.8" stroke="#ffffff" stroke-width="1.6" />
+      <line x1="22" y1="24.2" x2="22" y2="33" stroke="#ffffff" stroke-width="1.6" />
+    </g>
+
+    <!-- GCP Icon: Cloud Storage -->
+    <g id="icon-gcs">
+      <use href="#gcp-hex" />
+      <rect x="12" y="13" width="20" height="6.5" rx="1.5" fill="#ffffff" />
+      <rect x="12" y="22.5" width="20" height="6.5" rx="1.5" fill="#ffffff" />
+      <circle cx="16" cy="16.2" r="1.3" fill="#4285f4" />
+      <circle cx="16" cy="25.7" r="1.3" fill="#4285f4" />
+    </g>
+
+    <!-- GCP Icon: Dataproc -->
+    <g id="icon-dataproc">
+      <use href="#gcp-hex" />
+      <circle cx="16" cy="24" r="3.2" fill="#ffffff" />
+      <circle cx="28" cy="24" r="3.2" fill="#ffffff" />
+      <circle cx="22" cy="13.5" r="3.2" fill="#ffffff" />
+      <path d="M16,24 L22,13.5 L28,24 Z" fill="none" stroke="#ffffff" stroke-width="1.8" />
+    </g>
+
+    <!-- GCP Icon: BigQuery -->
+    <g id="icon-bigquery">
+      <use href="#gcp-hex" />
+      <circle cx="21" cy="20" r="7.5" fill="none" stroke="#ffffff" stroke-width="2.2" />
+      <rect x="17" y="19" width="2" height="4" fill="#ffffff" />
+      <rect x="20" y="16" width="2" height="7" fill="#ffffff" />
+      <rect x="23" y="17.5" width="2" height="5.5" fill="#ffffff" />
+      <line x1="26.5" y1="25.5" x2="31.5" y2="30.5" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" />
+    </g>
+
+    <!-- GCP Icon: Bigtable / Cloud SQL -->
+    <g id="icon-db">
+      <use href="#gcp-hex" />
+      <ellipse cx="22" cy="14" rx="8" ry="3.2" fill="#ffffff" />
+      <path d="M14,17.5 C14,19.5 30,19.5 30,17.5 L30,22 C30,24 14,24 14,22 Z" fill="#ffffff" />
+      <path d="M14,24.5 C14,26.5 30,26.5 30,24.5 L30,28.5 C30,30.5 14,30.5 14,28.5 Z" fill="#ffffff" />
+    </g>
+  </defs>
+
+  <!-- Canvas Background (#f8f9fa Official GCP Diagram Backdrop) -->
+  <rect x="0" y="0" width="1560" height="940" fill="#f8f9fa" />
+
+  <!-- ===================================================================== -->
+  <!-- TOP HEADER: Google Cloud Platform Logo & Title                        -->
+  <!-- ===================================================================== -->
+  <g transform="translate(36, 24)">
+    <!-- Multicolor GCP Hexagon Icon -->
+    <path d="M14,2 L24,2 L29,11 L24,20 L14,20 L9,11 Z" fill="none" />
+    <path d="M14,3 L24,3 L26.5,7.5 L16.5,7.5 L14,12 L11.5,7.5 Z" fill="#ea4335" />
+    <path d="M26.5,7.5 L29,12 L24,21 L19,21 L24,12 Z" fill="#4285f4" />
+    <path d="M11.5,7.5 L16.5,16.5 L24,16.5 L21.5,21 L14,21 L9,12 Z" fill="#fbbc05" />
+    <circle cx="19" cy="12" r="3.6" fill="#ffffff" />
+    <text x="38" y="17" font-family="Roboto, -apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="500" fill="#5f6368">Google Cloud Platform</text>
+    <text x="235" y="17" font-family="Roboto, -apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="400" fill="#80868b">— Professional Data Engineer (PDE) Spec-Driven Lakehouse &amp; Streaming Architecture ($300 Trial Safe)</text>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- ZONE 1: DATA SOURCE PROJECT / LAYER (LEFT LAVENDER BOX)               -->
+  <!-- ===================================================================== -->
+  <rect x="36" y="64" width="250" height="836" fill="#ebe6f4" stroke="#ffffff" stroke-width="2.5" />
+  <text x="52" y="92" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#3c4043">Data Source Zone</text>
+
+  <!-- Service Box 1A: Event Simulator (Stream Source) -->
+  <rect x="54" y="112" width="214" height="360" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="68" y="138" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">Jinder App & Event Producer</text>
+
+  <g class="diagram-node" data-node="simulator" transform="translate(72, 165)" style="cursor:pointer;">
+    <rect width="178" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="89" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Jinder Seeker Events</text>
+    <text x="89" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">(JOB_VIEW / SAVE / APPLY + FRS)</text>
+  </g>
+
+  <g class="diagram-node" data-node="simulator" transform="translate(72, 245)" style="cursor:pointer;">
+    <rect width="178" height="54" fill="#ffffff" stroke="#d93025" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="89" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#c5221f">Malformed Payload</text>
+    <text x="89" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">(5% Negative / Corrupt)</text>
+  </g>
+  <use href="#icon-pubsub" x="66" y="416" />
+
+  <!-- Service Box 1B: Batch & OLTP CDC Sources -->
+  <rect x="54" y="500" width="214" height="378" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="68" y="526" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">OLTP &amp; Batch Sources</text>
+
+  <g class="diagram-node" data-node="gcs_raw" transform="translate(72, 555)" style="cursor:pointer;">
+    <rect width="178" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="89" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Jinder AU Jobs &amp; Talents</text>
+    <text x="89" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">(jobs.json, talents.json, CSVs)</text>
+  </g>
+
+  <g class="diagram-node" data-node="cloudsql" transform="translate(72, 645)" style="cursor:pointer;">
+    <rect width="178" height="58" fill="#ffffff" stroke="#f29900" stroke-width="1.4" stroke-dasharray="4,2" filter="url(#box-shadow)" />
+    <text x="89" y="23" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Cloud SQL + Datastream</text>
+    <text x="89" y="41" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#b06000">Flag: enable_cloudsql_cdc</text>
+  </g>
+  <use href="#icon-db" x="66" y="822" />
+
+  <!-- ===================================================================== -->
+  <!-- ZONE 2A: STREAMING PIPELINE PROJECT A (TOP-MIDDLE LAVENDER BOX)       -->
+  <!-- ===================================================================== -->
+  <rect x="316" y="64" width="760" height="412" fill="#ebe6f4" stroke="#ffffff" stroke-width="2.5" />
+  <text x="334" y="92" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#3c4043">Streaming Pipeline A — Real-Time Hot Path (Pub/Sub + Apache Beam)</text>
+
+  <!-- Pub/Sub Box inside Pipeline A -->
+  <rect x="336" y="112" width="280" height="344" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="350" y="138" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">Pub/Sub</text>
+
+  <g class="diagram-node" data-node="pubsub" transform="translate(356, 165)" style="cursor:pointer;">
+    <rect width="240" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="120" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">pde-dev-events-topic</text>
+    <text x="120" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Sub: pde-dev-events-beam-sub</text>
+  </g>
+
+  <g class="diagram-node" data-node="dlq" transform="translate(356, 255)" style="cursor:pointer;">
+    <rect width="240" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="120" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">pde-dev-events-dlq-topic</text>
+    <text x="120" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Dead-Letter Policy (Max 5 Retries)</text>
+  </g>
+  <use href="#icon-pubsub" x="350" y="400" />
+
+  <!-- Vertical Dashed Bar 1: Pull Quota / Ack Deadline -->
+  <rect x="646" y="148" width="44" height="250" fill="#ffffff" fill-opacity="0.88" stroke="#9aa0a6" stroke-width="1.2" stroke-dasharray="3,3" />
+  <text x="673" y="273" text-anchor="middle" font-family="Roboto, sans-serif" font-size="12" fill="#5f6368" transform="rotate(-90 673 273)">Pull Quota &amp; Ack (60s)</text>
+
+  <!-- Dataflow Box inside Pipeline A -->
+  <rect x="720" y="112" width="266" height="344" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="734" y="138" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">Dataflow (Apache Beam)</text>
+
+  <g class="diagram-node" data-node="dataflow" transform="translate(740, 165)" style="cursor:pointer;">
+    <rect width="226" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="113" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Behavioral FRS* &amp; Window</text>
+    <text x="113" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">FRS*(J|C) Loop + Watermarks</text>
+  </g>
+
+  <g class="diagram-node" data-node="dlq" transform="translate(740, 255)" style="cursor:pointer;">
+    <rect width="226" height="54" fill="#ffffff" stroke="#d93025" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="113" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#c5221f">TaggedOutput('dlq') Filter</text>
+    <text x="113" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Routes Invalid Schema / Amount &lt; 0</text>
+  </g>
+  <use href="#icon-dataflow" x="734" y="400" />
+
+  <!-- Vertical Dashed Bar 2: Write / Publish Quota -->
+  <rect x="1012" y="148" width="44" height="250" fill="#ffffff" fill-opacity="0.88" stroke="#9aa0a6" stroke-width="1.2" stroke-dasharray="3,3" />
+  <text x="1039" y="273" text-anchor="middle" font-family="Roboto, sans-serif" font-size="12" fill="#5f6368" transform="rotate(-90 1039 273)">Storage Write Quota</text>
+
+  <!-- ===================================================================== -->
+  <!-- ZONE 2B: BATCH LAKEHOUSE PIPELINE B (BOTTOM-MIDDLE LAVENDER BOX)      -->
+  <!-- ===================================================================== -->
+  <rect x="316" y="498" width="760" height="402" fill="#ebe6f4" stroke="#ffffff" stroke-width="2.5" />
+  <text x="334" y="526" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#3c4043">Batch Lakehouse Pipeline B — Warm/Cold Path (GCS + Dataproc Spark + BigLake)</text>
+
+  <!-- Cloud Storage Raw/Temp Box inside Pipeline B -->
+  <rect x="336" y="544" width="280" height="334" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="350" y="570" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">Cloud Storage (Raw &amp; Temp)</text>
+
+  <g class="diagram-node" data-node="gcs_raw" transform="translate(356, 595)" style="cursor:pointer;">
+    <rect width="240" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="120" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">pde-dev-raw Bucket</text>
+    <text x="120" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Lifecycle: 30d Nearline / 90d Coldline</text>
+  </g>
+
+  <g class="diagram-node" data-node="governance" transform="translate(356, 680)" style="cursor:pointer;">
+    <rect width="240" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="120" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Cloud KMS (CMEK) + Temp</text>
+    <text x="120" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">90-Day Key Rotation / 7d Auto-Delete</text>
+  </g>
+  <use href="#icon-gcs" x="350" y="822" />
+
+  <!-- Vertical Dashed Bar 3: Serverless Spark Trigger -->
+  <rect x="646" y="576" width="44" height="240" fill="#ffffff" fill-opacity="0.88" stroke="#9aa0a6" stroke-width="1.2" stroke-dasharray="3,3" />
+  <text x="673" y="696" text-anchor="middle" font-family="Roboto, sans-serif" font-size="12" fill="#5f6368" transform="rotate(-90 673 696)">Serverless Batch Read</text>
+
+  <!-- Dataproc & Curated BigLake Box inside Pipeline B -->
+  <rect x="720" y="544" width="266" height="334" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="734" y="570" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">Dataproc Serverless &amp; BigLake</text>
+
+  <g class="diagram-node" data-node="dataproc" transform="translate(740, 595)" style="cursor:pointer;">
+    <rect width="226" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="113" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">PySpark ANZSCO &amp; Pay Job</text>
+    <text x="113" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Salary (hr*1950, day*220) Parquet</text>
+  </g>
+
+  <g class="diagram-node" data-node="gcs_curated" transform="translate(740, 680)" style="cursor:pointer;">
+    <rect width="226" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="113" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">pde-dev-curated + BigLake</text>
+    <text x="113" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Hive Partitioned (order_date)</text>
+  </g>
+  <use href="#icon-dataproc" x="734" y="822" />
+
+  <!-- Vertical Dashed Bar 4: External Connection -->
+  <rect x="1012" y="576" width="44" height="240" fill="#ffffff" fill-opacity="0.88" stroke="#9aa0a6" stroke-width="1.2" stroke-dasharray="3,3" />
+  <text x="1039" y="696" text-anchor="middle" font-family="Roboto, sans-serif" font-size="12" fill="#5f6368" transform="rotate(-90 1039 696)">BigLake &amp; SQLX Gate</text>
+
+  <!-- ===================================================================== -->
+  <!-- ZONE 3: DATA SINK, WAREHOUSE, AI & SERVING ZONE (RIGHT LAVENDER BOX)  -->
+  <!-- ===================================================================== -->
+  <rect x="1106" y="64" width="418" height="836" fill="#ebe6f4" stroke="#ffffff" stroke-width="2.5" />
+  <text x="1124" y="92" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#3c4043">Data Sink, Warehouse &amp; AI Serving Zone</text>
+
+  <!-- Service Box 3A: BigQuery Data Warehouse + Dataform + BQML -->
+  <rect x="1124" y="112" width="382" height="552" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="1138" y="138" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">BigQuery Warehouse, Dataform &amp; BQML</text>
+
+  <g class="diagram-node" data-node="bigquery" transform="translate(1148, 165)" style="cursor:pointer;">
+    <rect width="334" height="54" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="167" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Sink 1: raw.events_stream</text>
+    <text x="167" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Partition: DAY(event_timestamp) | Cluster: event_type, user_id</text>
+  </g>
+
+  <g class="diagram-node" data-node="dlq" transform="translate(1148, 255)" style="cursor:pointer;">
+    <rect width="334" height="54" fill="#ffffff" stroke="#d93025" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="167" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#c5221f">Sink 2: raw.malformed_events (DLQ)</text>
+    <text x="167" y="42" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Stores raw_payload + error_reason + failed_at</text>
+  </g>
+
+  <g class="diagram-node" data-node="governance" transform="translate(1148, 355)" style="cursor:pointer;">
+    <rect width="334" height="60" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="167" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Sink 3: dim_customers (Zero-PII) &amp; dim_jobs</text>
+    <text x="167" y="44" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#188038">REQ-A07 Policy Tag (PII_HIGH) + Dataform SQLX</text>
+  </g>
+
+  <g class="diagram-node" data-node="bqml" transform="translate(1148, 450)" style="cursor:pointer;">
+    <rect width="334" height="58" fill="#ffffff" stroke="#616161" stroke-width="1.2" filter="url(#box-shadow)" />
+    <text x="167" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Sink 4: BQML (jinder_shortlist_logreg)</text>
+    <text x="167" y="43" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#5f6368">Predicts Shortlist from F-01 SMF, F-02 GSI, F-05 FRS</text>
+  </g>
+  <use href="#icon-bigquery" x="1138" y="608" />
+
+  <!-- Service Box 3B: Cloud Bigtable Low-Latency Serving -->
+  <rect x="1124" y="684" width="382" height="194" fill="#e1f3fe" stroke="#ffffff" stroke-width="2" />
+  <text x="1138" y="710" font-family="Roboto, sans-serif" font-size="13" font-weight="500" fill="#3c4043">Cloud Bigtable (Low-Latency NoSQL Sink)</text>
+
+  <g class="diagram-node" data-node="bigtable" transform="translate(1148, 730)" style="cursor:pointer;">
+    <rect width="334" height="58" fill="#ffffff" stroke="#f29900" stroke-width="1.4" stroke-dasharray="4,2" filter="url(#box-shadow)" />
+    <text x="167" y="24" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" font-weight="600" fill="#202124">Sink 5: user_activity_serving (1 Node SSD)</text>
+    <text x="167" y="43" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#b06000">Anti-Hotspot Key: SALT(4)#user_id#reverse_epoch_ms</text>
+  </g>
+  <use href="#icon-db" x="1138" y="822" />
+
+  <!-- ===================================================================== -->
+  <!-- ORTHOGONAL GOOGLE-BLUE CONNECTOR ARROWS & LABELS                      -->
+  <!-- ===================================================================== -->
+
+  <!-- 1. Simulator -> Pub/Sub Topic -->
+  <path id="flow-sim-pubsub" d="M 250 192 L 356 192" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <text x="303" y="184" text-anchor="middle" font-family="Roboto, sans-serif" font-size="11" fill="#202124">Publish JSON</text>
+
+  <!-- 2. Simulator Malformed -> Pub/Sub Topic -->
+  <path d="M 250 272 L 295 272 Q 305 272 305 262 L 305 204 Q 305 192 315 192 L 356 192" fill="none" stroke="#4285f4" stroke-width="1.4" marker-end="url(#arrow-blue)" />
+
+  <!-- 3. Pub/Sub Retry Exhausted -> DLQ Topic -->
+  <path d="M 476 219 L 476 255" fill="none" stroke="#ea4335" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-red)" />
+  <text x="530" y="241" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#c5221f">5 Failed Retries</text>
+
+  <!-- 4. Pub/Sub -> Pull Quota -> Dataflow Windowing -->
+  <path d="M 596 192 L 646 192" fill="none" stroke="#4285f4" stroke-width="1.6" />
+  <path id="flow-pubsub-beam" d="M 690 192 L 740 192" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <text x="715" y="176" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">Pull</text>
+  <text x="715" y="188" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">messages</text>
+
+  <!-- 5. Dataflow Windowing -> TaggedOutput('dlq') Filter -->
+  <path d="M 853 219 L 853 255" fill="none" stroke="#ea4335" stroke-width="1.6" marker-end="url(#arrow-red)" />
+
+  <!-- 6. Dataflow Valid -> Write Quota -> BigQuery raw.events_stream -->
+  <path d="M 966 192 L 1012 192" fill="none" stroke="#4285f4" stroke-width="1.6" />
+  <path id="flow-beam-bq" d="M 1056 192 L 1148 192" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <text x="1100" y="176" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">Stream</text>
+  <text x="1100" y="188" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">valid rows</text>
+
+  <!-- 7. Dataflow DLQ -> Write Quota -> BigQuery raw.malformed_events -->
+  <path d="M 966 282 L 1012 282" fill="none" stroke="#ea4335" stroke-width="1.6" />
+  <path id="flow-beam-dlq" d="M 1056 282 L 1148 282" fill="none" stroke="#ea4335" stroke-width="1.6" marker-end="url(#arrow-red)" />
+  <text x="1100" y="266" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#c5221f">Quarantine</text>
+  <text x="1100" y="278" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#c5221f">DLQ rows</text>
+
+  <!-- 8. Dataflow Valid -> Bigtable Sink 5 (Orthogonal drop-down line like Pipeline 3 in user's image!) -->
+  <path id="flow-beam-bt" d="M 1072 192 L 1072 749 Q 1072 759 1082 759 L 1148 759" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <text x="1095" y="725" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">Write salted</text>
+  <text x="1095" y="738" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">row keys</text>
+
+  <!-- 9. Batch Files & Cloud SQL CDC -> GCS Raw Bucket -->
+  <path id="flow-batch-raw" d="M 250 582 L 295 582 Q 305 582 305 592 L 305 612 Q 305 622 315 622 L 356 622" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <path d="M 250 674 L 295 674 Q 305 674 305 664 L 305 632 Q 305 622 315 622 L 356 622" fill="none" stroke="#4285f4" stroke-width="1.4" stroke-dasharray="4,2" marker-end="url(#arrow-blue)" />
+  <text x="296" y="570" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">Upload / CDC</text>
+
+  <!-- 10. GCS Raw -> Batch Read Quota -> Dataproc PySpark -->
+  <path d="M 596 622 L 646 622" fill="none" stroke="#4285f4" stroke-width="1.6" />
+  <path id="flow-raw-spark" d="M 690 622 L 740 622" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <text x="715" y="612" text-anchor="middle" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">Read JSON</text>
+
+  <!-- 11. Dataproc PySpark -> GCS Curated + BigLake -->
+  <path d="M 853 649 L 853 680" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+
+  <!-- 12. GCS Curated + BigLake -> BigQuery Marts (Orthogonal step-up line like Sink Topic 3 in user's image!) -->
+  <path d="M 966 707 L 1012 707" fill="none" stroke="#4285f4" stroke-width="1.6" />
+  <path id="flow-biglake-marts" d="M 1056 707 L 1080 707 Q 1090 707 1090 697 L 1090 395 Q 1090 385 1100 385 L 1148 385" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <text x="1096" y="535" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">BigLake Parquet</text>
+  <text x="1096" y="548" font-family="Roboto, sans-serif" font-size="10.5" fill="#202124">&amp; Dataform SQLX</text>
+
+  <!-- 13. BigQuery raw.events_stream -> marts -> BQML -->
+  <path d="M 1315 219 L 1315 245" fill="none" stroke="#4285f4" stroke-width="1.2" stroke-dasharray="2,2" />
+  <path d="M 1315 309 L 1315 355" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+  <path d="M 1315 415 L 1315 450" fill="none" stroke="#4285f4" stroke-width="1.6" marker-end="url(#arrow-blue)" />
+</svg>
+
+  </div>
+
+  <script>
+    (function () {
+      let isAnimating = true;
+      const btn = document.getElementById("btn-toggle-anim");
+      const paths = document.querySelectorAll("#gcp-arch-svg path[marker-end]");
+
+      function applyState() {
+        paths.forEach((p) => p.classList.toggle("flowing-line", isAnimating));
+        btn.textContent = isAnimating ? "Pause Flow Animation" : "Play Flow Animation";
+        btn.classList.toggle("active", isAnimating);
+      }
+
+      btn.addEventListener("click", () => {
+        isAnimating = !isAnimating;
+        applyState();
+      });
+
+      applyState();
+    })();
+  </script>
+</body>
+</html>
