@@ -1,0 +1,22 @@
+config {
+  type: "incremental",
+  schema: "marts",
+  bigquery: {
+    partitionBy: "order_date"
+  },
+  assertions: {
+    uniqueKey: ["order_date"],
+    nonNull: ["order_date", "total_revenue"]
+  }
+}
+
+SELECT
+  DATE(event_timestamp) AS order_date,
+  COUNTIF(event_type = 'CHECKOUT') AS total_orders,
+  SUM(CASE WHEN event_type = 'CHECKOUT' THEN order_amount ELSE 0.0 END) AS total_revenue,
+  COUNT(DISTINCT user_id) AS unique_customers,
+  CURRENT_TIMESTAMP() AS refreshed_at
+FROM
+  ${ref("stg_events")}
+GROUP BY
+  1

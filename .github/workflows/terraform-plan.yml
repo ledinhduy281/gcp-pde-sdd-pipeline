@@ -1,0 +1,56 @@
+name: "Terraform Spec Validation & Plan"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - "specs/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate-and-plan:
+    name: "Validate Spec Compliance & Terraform Plan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Run Data Contract Unit Tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Test Dependencies & Run Pytest
+        run: |
+          pip install pytest
+          pytest tests/ -v
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.5"
+
+      - name: Terraform Format Check
+        run: terraform -chdir=infra fmt -check -recursive
+
+      - name: Authenticate to GCP via Workload Identity Federation (If Configured)
+        if: ${{ vars.GCP_WIF_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Terraform Init & Plan
+        if: ${{ vars.GCP_PROJECT_ID != '' }}
+        run: |
+          terraform -chdir=infra/environments/dev init \
+            -backend-config="bucket=${{ vars.GCP_PROJECT_ID }}-tfstate" \
+            -backend-config="prefix=pde-lakehouse/dev"
+          terraform -chdir=infra/environments/dev validate
+          terraform -chdir=infra/environments/dev plan \
+            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="region=${{ vars.GCP_REGION || 'us-central1' }}"

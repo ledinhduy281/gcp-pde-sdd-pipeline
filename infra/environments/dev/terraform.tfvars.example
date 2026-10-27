@@ -1,0 +1,12 @@
+project_id        = "your-gcp-project-id"
+region            = "us-central1"
+project_prefix    = "pde"
+environment       = "dev"
+github_repository = "ledinhduy281/gcp-pde-sdd-pipeline"
+
+# Hourly Lab Toggles (Keep false when not actively testing!)
+enable_cloudsql_cdc        = false
+enable_bigtable_serving    = false
+enable_dataproc_serverless = false
+enable_streaming_dataflow  = false
+enable_composer            = false

@@ -1,0 +1,24 @@
+config {
+  type: "view",
+  schema: "staging",
+  description: "Deduplicated clean streaming events view with partition filter requirement",
+  assertions: {
+    nonNull: ["event_id", "event_timestamp", "user_id", "event_type"]
+  }
+}
+
+SELECT
+  event_id,
+  event_timestamp,
+  user_id,
+  session_id,
+  event_type,
+  COALESCE(order_amount, 0.0) AS order_amount,
+  customer_email,
+  device_os
+FROM
+  `raw.events_stream`
+WHERE
+  event_timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY event_id ORDER BY ingestion_timestamp DESC) = 1

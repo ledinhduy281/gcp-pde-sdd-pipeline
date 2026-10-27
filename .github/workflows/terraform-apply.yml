@@ -1,0 +1,45 @@
+name: "Terraform Core Serverless Deploy"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/**"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy-core:
+    name: "Apply Core Serverless Infrastructure ($0/hr Tier)"
+    runs-on: ubuntu-latest
+    if: ${{ vars.GCP_WIF_PROVIDER != '' && vars.GCP_PROJECT_ID != '' }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.5"
+
+      - name: Authenticate to GCP via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Terraform Init & Apply Core Tier
+        run: |
+          terraform -chdir=infra/environments/dev init \
+            -backend-config="bucket=${{ vars.GCP_PROJECT_ID }}-tfstate" \
+            -backend-config="prefix=pde-lakehouse/dev"
+          terraform -chdir=infra/environments/dev apply -auto-approve \
+            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="region=${{ vars.GCP_REGION || 'us-central1' }}" \
+            -var="enable_cloudsql_cdc=false" \
+            -var="enable_bigtable_serving=false" \
+            -var="enable_dataproc_serverless=false" \
+            -var="enable_streaming_dataflow=false" \
+            -var="enable_composer=false"

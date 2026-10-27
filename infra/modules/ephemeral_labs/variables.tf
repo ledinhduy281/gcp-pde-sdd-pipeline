@@ -1,0 +1,14 @@
+variable "project_id" { type = string }
+variable "region" { type = string }
+variable "name_prefix" { type = string }
+variable "sa_process_email" { type = string }
+variable "sa_orchestrate_email" { type = string }
+variable "raw_bucket_name" { type = string }
+variable "curated_bucket_name" { type = string }
+variable "temp_bucket_name" { type = string }
+variable "enable_cloudsql_cdc" { type = bool }
+variable "enable_bigtable_serving" { type = bool }
+variable "enable_dataproc_serverless" { type = bool }
+variable "enable_streaming_dataflow" { type = bool }
+variable "enable_composer" { type = bool }
+variable "common_labels" { type = map(string) }

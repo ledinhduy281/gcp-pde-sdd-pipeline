@@ -1,0 +1,5 @@
+defaultProject: your-gcp-project-id
+defaultLocation: us-central1
+defaultDataset: staging
+defaultAssertionDataset: staging_assertions
+dataformCoreVersion: 3.0.0
