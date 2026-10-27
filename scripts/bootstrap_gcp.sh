@@ -33,7 +33,9 @@ gcloud services enable \
   storage.googleapis.com \
   bigquery.googleapis.com \
   bigqueryconnection.googleapis.com \
-  bigquerystorage.googleapis.com \
+  bigquerystorage.googleapis.com
+
+gcloud services enable \
   pubsub.googleapis.com \
   dataflow.googleapis.com \
   dataproc.googleapis.com \

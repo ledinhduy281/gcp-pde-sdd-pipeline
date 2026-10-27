@@ -52,11 +52,11 @@ resource "google_data_catalog_policy_tag" "pii_high" {
 
 # Contract 2.1: Partitioned & Clustered Streaming Events Table
 resource "google_bigquery_table" "events_stream" {
-  dataset_id          = google_bigquery_dataset.raw.dataset_id
-  table_id            = "events_stream"
-  deletion_protection = false
+  dataset_id               = google_bigquery_dataset.raw.dataset_id
+  table_id                 = "events_stream"
+  deletion_protection      = false
   require_partition_filter = true
-  labels              = merge(var.common_labels, { cost_tier = "serverless" })
+  labels                   = merge(var.common_labels, { cost_tier = "serverless" })
 
   time_partitioning {
     type  = "DAY"
@@ -111,10 +111,10 @@ resource "google_bigquery_table" "dim_customers" {
   schema = jsonencode([
     { name = "user_id", type = "STRING", mode = "REQUIRED" },
     {
-      name        = "customer_email"
-      type        = "STRING"
-      mode        = "NULLABLE"
-      policyTags  = { names = [google_data_catalog_policy_tag.pii_high.id] }
+      name       = "customer_email"
+      type       = "STRING"
+      mode       = "NULLABLE"
+      policyTags = { names = [google_data_catalog_policy_tag.pii_high.id] }
     },
     { name = "loyalty_tier", type = "STRING", mode = "NULLABLE" },
     { name = "region", type = "STRING", mode = "NULLABLE" },

@@ -17,12 +17,12 @@ resource "google_pubsub_topic" "events" {
 }
 
 resource "google_pubsub_subscription" "events_beam_sub" {
-  name                       = "${var.name_prefix}-events-beam-sub"
-  topic                      = google_pubsub_topic.events.id
-  ack_deadline_seconds       = 60
-  retain_acked_messages      = false
-  enable_message_ordering    = false
-  labels                     = merge(var.common_labels, { cost_tier = "serverless" })
+  name                    = "${var.name_prefix}-events-beam-sub"
+  topic                   = google_pubsub_topic.events.id
+  ack_deadline_seconds    = 60
+  retain_acked_messages   = false
+  enable_message_ordering = false
+  labels                  = merge(var.common_labels, { cost_tier = "serverless" })
 
   dead_letter_policy {
     dead_letter_topic     = google_pubsub_topic.events_dlq.id

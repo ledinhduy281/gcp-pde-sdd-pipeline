@@ -5,11 +5,11 @@ Track your progress toward the **Google Cloud Professional Data Engineer (PDE)**
 ---
 
 ## Phase 1: Connection, Bootstrap & Core Serverless IaC (Week 1)
-- [ ] **T-1.1**: Authenticate `gcloud` and Application Default Credentials (ADC).
+- [x] **T-1.1**: Authenticate `gcloud` and Application Default Credentials (ADC).
   - *Verify*: `gcloud auth application-default print-access-token >/dev/null && echo "ADC OK"`
-- [ ] **T-1.2**: Run `make bootstrap` to enable GCP APIs and create the versioned GCS Terraform State bucket.
-  - *Verify*: `gcloud storage buckets describe gs://${GCP_PROJECT_ID}-tfstate --format="value(versioning.enabled)"`
-- [ ] **T-1.3**: Create the GitHub repository `ledinhduy281/gcp-pde-sdd-pipeline` and push the SDD codebase.
+- [x] **T-1.2**: Run `make bootstrap` to enable GCP APIs and create the versioned GCS Terraform State bucket.
+  - *Verify*: `gcloud storage buckets describe gs://${GCP_PROJECT_ID}-tfstate --format="value(versioning_enabled)"`
+- [x] **T-1.3**: Create the GitHub repository `ledinhduy281/gcp-pde-sdd-pipeline` and push the SDD codebase.
   - *Verify*: `gh repo view ledinhduy281/gcp-pde-sdd-pipeline`
 - [ ] **T-1.4**: Validate and deploy the Core Serverless Terraform infrastructure (`$0.00/hr`).
   - *Verify*: `make validate-infra && make apply-core`

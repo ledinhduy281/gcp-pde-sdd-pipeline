@@ -17,14 +17,14 @@ module "iam_security" {
 }
 
 module "storage_lakehouse" {
-  source              = "../../modules/storage_lakehouse"
-  project_id          = var.project_id
-  region              = var.region
-  name_prefix         = local.name_prefix
-  sa_ingest_email     = module.iam_security.sa_ingest_email
-  sa_process_email    = module.iam_security.sa_process_email
-  kms_crypto_key_id   = module.iam_security.kms_crypto_key_id
-  common_labels       = local.common_labels
+  source            = "../../modules/storage_lakehouse"
+  project_id        = var.project_id
+  region            = var.region
+  name_prefix       = local.name_prefix
+  sa_ingest_email   = module.iam_security.sa_ingest_email
+  sa_process_email  = module.iam_security.sa_process_email
+  kms_crypto_key_id = module.iam_security.kms_crypto_key_id
+  common_labels     = local.common_labels
 }
 
 module "pubsub_messaging" {
@@ -37,15 +37,15 @@ module "pubsub_messaging" {
 }
 
 module "bigquery_dwh" {
-  source                      = "../../modules/bigquery_dwh"
-  project_id                  = var.project_id
-  region                      = var.region
-  name_prefix                 = local.name_prefix
-  curated_bucket_name         = module.storage_lakehouse.curated_bucket_name
-  biglake_connection_id       = module.storage_lakehouse.biglake_connection_id
-  sa_process_email            = module.iam_security.sa_process_email
-  sa_orchestrate_email        = module.iam_security.sa_orchestrate_email
-  common_labels               = local.common_labels
+  source                = "../../modules/bigquery_dwh"
+  project_id            = var.project_id
+  region                = var.region
+  name_prefix           = local.name_prefix
+  curated_bucket_name   = module.storage_lakehouse.curated_bucket_name
+  biglake_connection_id = module.storage_lakehouse.biglake_connection_id
+  sa_process_email      = module.iam_security.sa_process_email
+  sa_orchestrate_email  = module.iam_security.sa_orchestrate_email
+  common_labels         = local.common_labels
 }
 
 module "orchestration" {
