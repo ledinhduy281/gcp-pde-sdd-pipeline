@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Presentation — Smart E-Commerce Data Platform on Google Cloud</title>
+  <link rel="stylesheet" href="styles/deck.css" />
+  <link rel="stylesheet" href="styles/transitions.css" />
+</head>
+<body>
+  <!-- Top Progress Bar -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <!-- Header Navigation Bar -->
+  <header class="deck-header">
+    <div class="deck-brand">
+      <span class="deck-pill">EXECUTIVE OVERVIEW</span>
+      <span class="deck-title" id="deck-header-title">Nền Tảng Dữ Liệu Thông Minh & Tối Ưu Chi Phí Trên Google Cloud</span>
+    </div>
+    <div class="deck-actions">
+      <span class="slide-counter" id="slide-counter">1 / 8</span>
+      <button class="ctrl-btn" id="btn-notes" title="Bật/Tắt Kịch bản thuyết trình (Speaker Notes)">🎙️ Lời dẫn (Notes)</button>
+      <button class="ctrl-btn" id="btn-deck-lang" title="Đổi ngôn ngữ thuyết trình">🇻🇳 VI / 🇬🇧 EN</button>
+      <button class="ctrl-btn" id="btn-fullscreen" title="Toàn màn hình (Fullscreen)">⛶ Fullscreen</button>
+    </div>
+  </header>
+
+  <!-- Animated Slide Stage -->
+  <main class="slide-stage" id="slide-stage">
+    <!-- Dynamic slide content injected by scripts/deck-controller.js -->
+  </main>
+
+  <!-- Speaker Notes Drawer -->
+  <aside class="notes-drawer hidden" id="notes-drawer">
+    <div class="notes-header">
+      <strong>🎙️ Gợi ý lời nói khi thuyết trình (Speaker Script):</strong>
+      <button class="close-notes" id="btn-close-notes">✕</button>
+    </div>
+    <p id="notes-content"></p>
+  </aside>
+
+  <!-- Bottom Slide Controls -->
+  <footer class="deck-footer">
+    <button class="nav-btn" id="btn-prev">← Slide Trước</button>
+    <div class="dot-indicators" id="dot-indicators"></div>
+    <button class="nav-btn primary" id="btn-next">Slide Tiếp Theo →</button>
+  </footer>
+
+  <script src="scripts/slides-content.js"></script>
+  <script src="scripts/deck-controller.js"></script>
+</body>
+</html>

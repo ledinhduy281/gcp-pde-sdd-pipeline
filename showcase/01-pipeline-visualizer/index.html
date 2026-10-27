@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCP Data Pipeline Interactive Learning Visualizer</title>
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/pipeline-animations.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-badge">GCP PDE VISUALIZER</span>
+      <div>
+        <h1 id="app-title">Bản Đồ Trực Quan Hệ Thống Dữ Liệu GCP</h1>
+        <p id="app-subtitle">Dành cho người mới bắt đầu: Click vào từng khối hoặc bấm nút Mô phỏng luồng dữ liệu</p>
+      </div>
+    </div>
+
+    <div class="topbar-controls">
+      <div class="cost-pill" id="live-cost-pill">
+        <span class="pulse-dot green" id="cost-dot"></span>
+        <span id="cost-label">Chi phí hiện tại:</span>
+        <strong id="cost-value">$0.00 / giờ</strong>
+      </div>
+      <button class="btn btn-secondary" id="btn-tour">🧭 Hướng dẫn từng bước</button>
+      <button class="btn btn-lang" id="btn-lang" title="Switch Language">🇻🇳 VI / 🇬🇧 EN</button>
+    </div>
+  </header>
+
+  <section class="action-bar">
+    <div class="sim-buttons">
+      <span class="section-tag" id="sim-label">Mô phỏng luồng dữ liệu chạy qua Pipeline:</span>
+      <button class="btn btn-sim valid" data-sim="valid" id="btn-sim-valid">
+        ⚡ 1. Gửi Đơn hàng Chuẩn (Real-time)
+      </button>
+      <button class="btn btn-sim dlq" data-sim="dlq" id="btn-sim-dlq">
+        🛡️ 2. Gửi Dữ liệu Lỗi (Xem cách lọc rác DLQ)
+      </button>
+      <button class="btn btn-sim batch" data-sim="batch" id="btn-sim-batch">
+        📦 3. Chạy Lô Dữ liệu Lớn (Batch Lakehouse)
+      </button>
+    </div>
+
+    <div class="lab-toggles">
+      <span class="section-tag" id="toggle-label">Thử bật/tắt dịch vụ tính tiền theo giờ (Terraform Flags):</span>
+      <label class="toggle-chip">
+        <input type="checkbox" data-flag="cloudsql" />
+        <span>Cloud SQL CDC (+$0.03/h)</span>
+      </label>
+      <label class="toggle-chip">
+        <input type="checkbox" data-flag="dataflow" />
+        <span>Dataflow Stream (+$0.07/h)</span>
+      </label>
+      <label class="toggle-chip">
+        <input type="checkbox" data-flag="bigtable" />
+        <span>Bigtable NoSQL (+$0.65/h)</span>
+      </label>
+      <label class="toggle-chip">
+        <input type="checkbox" data-flag="composer" />
+        <span>Composer Airflow (+$0.45/h)</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- Live Simulation Narrative Banner -->
+  <div class="sim-banner" id="sim-banner">
+    <span class="sim-step-badge" id="sim-step-badge">SẴN SÀNG</span>
+    <span id="sim-narrative">Hãy bấm một trong 3 nút "Mô phỏng luồng dữ liệu" phía trên hoặc click vào bất kỳ thành phần nào trên sơ đồ để hiểu nguyên lý hoạt động!</span>
+  </div>
+
+  <main class="workspace">
+    <!-- Left: Interactive Architecture Canvas -->
+    <div class="canvas-container">
+      <div class="architecture-grid" id="arch-grid">
+        <!-- Stage 1: Sources -->
+        <div class="arch-column">
+          <div class="column-header">1. Nguồn Dữ Liệu (Sources)</div>
+          <div class="node-card serverless" data-node="simulator" id="node-simulator">
+            <div class="node-tier-tag free">Miễn phí (Local/Script)</div>
+            <div class="node-icon">💻</div>
+            <h3>Event Simulator</h3>
+            <p class="node-analogy">Máy tạo đơn hàng & thao tác click giả lập</p>
+          </div>
+
+          <div class="node-card hourly" data-node="cloudsql" id="node-cloudsql">
+            <div class="node-tier-tag paid">Tắt mặc định ($0.03/h)</div>
+            <div class="node-icon">🗄️</div>
+            <h3>Cloud SQL + Datastream</h3>
+            <p class="node-analogy">Sổ cái giao dịch & máy photocopy tự động (CDC)</p>
+          </div>
+        </div>
+
+        <!-- Stage 2: Ingestion -->
+        <div class="arch-column">
+          <div class="column-header">2. Tiếp Nhận (Ingestion)</div>
+          <div class="node-card serverless" data-node="pubsub" id="node-pubsub">
+            <div class="node-tier-tag free">Luôn bật ($0 Free Tier)</div>
+            <div class="node-icon">📨</div>
+            <h3>Cloud Pub/Sub</h3>
+            <p class="node-analogy">Băng chuyền bưu điện tốc độ cao (nhận hàng triệu tin/giây)</p>
+          </div>
+
+          <div class="node-card serverless" data-node="dlq" id="node-dlq">
+            <div class="node-tier-tag free">Luôn bật ($0 Free Tier)</div>
+            <div class="node-icon">🗑️</div>
+            <h3>Dead-Letter Queue (DLQ)</h3>
+            <p class="node-analogy">Khay hứng hàng lỗi (ngăn dữ liệu hỏng làm sập hệ thống)</p>
+          </div>
+
+          <div class="node-card serverless" data-node="gcs_raw" id="node-gcs_raw">
+            <div class="node-tier-tag free">Luôn bật ($0 Free Tier)</div>
+            <div class="node-icon">🪣</div>
+            <h3>GCS Raw Bucket</h3>
+            <p class="node-analogy">Kho bãi tập kết hàng thô (lưu mọi file gốc giá siêu rẻ)</p>
+          </div>
+        </div>
+
+        <!-- Stage 3: Processing -->
+        <div class="arch-column">
+          <div class="column-header">3. Chế Biến (Processing)</div>
+          <div class="node-card hourly" data-node="dataflow" id="node-dataflow">
+            <div class="node-tier-tag paid">Chỉ bật khi học ($0.07/h)</div>
+            <div class="node-icon">🌊</div>
+            <h3>Dataflow (Apache Beam)</h3>
+            <p class="node-analogy">Nhà máy lọc nước liên tục 24/7 (kiểm tra, chia khung giờ)</p>
+          </div>
+
+          <div class="node-card hourly" data-node="dataproc" id="node-dataproc">
+            <div class="node-tier-tag paid">Chạy xong tự tắt ($0.05/lần)</div>
+            <div class="node-icon">⚡</div>
+            <h3>Dataproc Serverless (Spark)</h3>
+            <p class="node-analogy">Đội xe tải hạng nặng thuê theo chuyến (xử lý lô lớn rồi nghỉ)</p>
+          </div>
+        </div>
+
+        <!-- Stage 4: Lakehouse & Serving -->
+        <div class="arch-column">
+          <div class="column-header">4. Kho Tinh Luyện (Lakehouse)</div>
+          <div class="node-card serverless" data-node="gcs_curated" id="node-gcs_curated">
+            <div class="node-tier-tag free">Luôn bật ($0 Free Tier)</div>
+            <div class="node-icon">📚</div>
+            <h3>GCS Curated + BigLake</h3>
+            <p class="node-analogy">Kệ sách đóng gói chuẩn Parquet (nén gọn, đọc siêu tốc)</p>
+          </div>
+
+          <div class="node-card serverless" data-node="bigquery" id="node-bigquery">
+            <div class="node-tier-tag free">Luôn bật (1TB query/tháng)</div>
+            <div class="node-icon">🏛️</div>
+            <h3>BigQuery + Dataform</h3>
+            <p class="node-analogy">Trung tâm phân tích trung ương (chia ngăn theo ngày & khách)</p>
+          </div>
+
+          <div class="node-card hourly" data-node="bigtable" id="node-bigtable">
+            <div class="node-tier-tag paid">Chỉ bật khi học ($0.65/h)</div>
+            <div class="node-icon">🚀</div>
+            <h3>Cloud Bigtable</h3>
+            <p class="node-analogy">Quầy trả kết quả dưới 10ms cho App (chống nghẽn cổ chai)</p>
+          </div>
+        </div>
+
+        <!-- Stage 5: Governance, AI & Orchestration -->
+        <div class="arch-column">
+          <div class="column-header">5. Bảo Mật, AI & Điều Phối</div>
+          <div class="node-card serverless" data-node="governance" id="node-governance">
+            <div class="node-tier-tag free">Luôn bật ($0 Free Tier)</div>
+            <div class="node-icon">🔐</div>
+            <h3>IAM, KMS & Policy Tags</h3>
+            <p class="node-analogy">Thẻ từ phân quyền & kính mờ tự động che Email/SĐT khách</p>
+          </div>
+
+          <div class="node-card serverless" data-node="bqml" id="node-bqml">
+            <div class="node-tier-tag free">Luôn bật (Free Tier)</div>
+            <div class="node-icon">🧠</div>
+            <h3>BigQuery ML (AI)</h3>
+            <p class="node-analogy">Chuyên gia dự báo doanh thu & khách sắp rời bỏ bằng SQL</p>
+          </div>
+
+          <div class="node-card serverless" data-node="orchestration" id="node-orchestration">
+            <div class="node-tier-tag free">Workflows ($0) / Composer</div>
+            <div class="node-icon">🎼</div>
+            <h3>Cloud Workflows / Composer</h3>
+            <p class="node-analogy">Nhạc trưởng tự động bấm giờ đánh thức các khâu mỗi ngày</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Deep-Dive Beginner Inspector Panel -->
+    <aside class="inspector-panel" id="inspector-panel">
+      <div class="inspector-header">
+        <span class="inspector-icon" id="insp-icon">🏛️</span>
+        <div>
+          <span class="inspector-badge" id="insp-tier">CORE SERVERLESS ($0/tháng)</span>
+          <h2 id="insp-title">BigQuery + Dataform</h2>
+        </div>
+      </div>
+
+      <div class="inspector-body">
+        <div class="info-card highlight">
+          <h4>💡 Hiểu đơn giản (Dành cho người mới)</h4>
+          <p id="insp-analogy"></p>
+        </div>
+
+        <div class="info-card">
+          <h4>⚙️ Vai trò trong Pipeline của bạn</h4>
+          <p id="insp-role"></p>
+        </div>
+
+        <div class="info-card pde-card">
+          <h4>🎯 Điểm ăn điểm khi thi chứng chỉ PDE</h4>
+          <ul id="insp-pde"></ul>
+        </div>
+
+        <div class="info-card code-card">
+          <h4>🗂️ File Code & Hướng dẫn xem trên GCP UI</h4>
+          <p><strong>Terraform / Code:</strong> <code id="insp-code"></code></p>
+          <p><strong>Cách mở trên GCP Console:</strong> <span id="insp-ui"></span></p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="scripts/nodes-data.js"></script>
+  <script src="scripts/simulator-engine.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>
