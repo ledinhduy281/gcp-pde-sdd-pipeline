@@ -40,7 +40,7 @@ plan:
 	terraform -chdir=$(TF_DIR) plan -var="project_id=$${GCP_PROJECT_ID}" -var="region=$(GCP_REGION)"
 
 apply-core:
-	terraform -chdir=$(TF_DIR) apply \
+	terraform -chdir=$(TF_DIR) apply -auto-approve \
 		-var="project_id=$${GCP_PROJECT_ID}" \
 		-var="region=$(GCP_REGION)" \
 		-var="enable_cloudsql_cdc=false" \
@@ -50,19 +50,19 @@ apply-core:
 		-var="enable_composer=false"
 
 lab-cdc-on:
-	terraform -chdir=$(TF_DIR) apply \
+	terraform -chdir=$(TF_DIR) apply -auto-approve \
 		-var="project_id=$${GCP_PROJECT_ID}" \
 		-var="region=$(GCP_REGION)" \
 		-var="enable_cloudsql_cdc=true"
 
 lab-bigtable-on:
-	terraform -chdir=$(TF_DIR) apply \
+	terraform -chdir=$(TF_DIR) apply -auto-approve \
 		-var="project_id=$${GCP_PROJECT_ID}" \
 		-var="region=$(GCP_REGION)" \
 		-var="enable_bigtable_serving=true"
 
 lab-composer-on:
-	terraform -chdir=$(TF_DIR) apply \
+	terraform -chdir=$(TF_DIR) apply -auto-approve \
 		-var="project_id=$${GCP_PROJECT_ID}" \
 		-var="region=$(GCP_REGION)" \
 		-var="enable_composer=true"
@@ -74,4 +74,4 @@ destroy-all:
 	terraform -chdir=$(TF_DIR) destroy -var="project_id=$${GCP_PROJECT_ID}" -var="region=$(GCP_REGION)"
 
 test:
-	pytest tests/ -v
+	PYTHONPATH=. pytest tests/ -v
